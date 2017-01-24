@@ -59,7 +59,7 @@ final class PayloadBuilder implements PayloadBuilderInterface
         $tos = array_merge((array) $message->getTo(), (array) $message->getCc());
         $bcc = (array) $message->getBcc();
 
-        if (!$tos) {
+        if (count($tos) === 0) {
             throw new Exception('Cannot send message without a recipient address');
         }
 
@@ -72,6 +72,8 @@ final class PayloadBuilder implements PayloadBuilderInterface
             $metadata         = $message->getPerRecipientMetadata();
             $substitutionData = $message->getPerRecipientSubstitutionData();
         }
+
+        $recipients = [];
 
         foreach ($tos as $email => $name) {
             $recipients[] = $this->buildRecipient($email, $name, $tags, $metadata, $substitutionData);
@@ -87,12 +89,12 @@ final class PayloadBuilder implements PayloadBuilderInterface
     }
 
     /**
-     * @param string      $email
-     * @param string      $name
-     * @param array       $tags
-     * @param array       $metadata
-     * @param array       $substitutionData
-     * @param string|null $originalEmail
+     * @param string $email
+     * @param string $name
+     * @param array  $tags
+     * @param array  $metadata
+     * @param array  $substitutionData
+     * @param string $originalEmail
      *
      * @return array
      */
@@ -102,7 +104,7 @@ final class PayloadBuilder implements PayloadBuilderInterface
         array $tags,
         array $metadata,
         array $substitutionData,
-        $originalEmail = null
+        $originalEmail = ''
     ) {
         $recipient = ['address' => ['email' => $email]];
 

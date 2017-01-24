@@ -253,7 +253,7 @@ final class Message extends Swift_Message
         array_walk_recursive(
             $metadata,
             function ($value) {
-                if (is_object($value) or is_resource($value)) {
+                if (is_object($value) || is_resource($value)) {
                     throw new Exception('Metadata cannot contain objects or resources');
                 }
             }
