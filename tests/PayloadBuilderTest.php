@@ -40,10 +40,10 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_builds_the_payload_for_a_plain_swift_message()
     {
         $message = Swift_Message::newInstance()
-                                ->setFrom('me@domain.com')
-                                ->setTo(['john@doe.com'])
-                                ->setSubject('Hello there!')
-                                ->setBody('This is a special message just for you.', 'text/plain');
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com'])
+            ->setSubject('Hello there!')
+            ->setBody('This is a special message just for you.', 'text/plain');
 
         $expectedPayload = [
             'recipients' => [
@@ -67,10 +67,10 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_builds_the_same_payload_with_default_options_for_an_extended_message()
     {
         $message = Message::newInstance()
-                          ->setFrom('me@domain.com')
-                          ->setTo(['john@doe.com'])
-                          ->setSubject('Hello there!')
-                          ->setBody('This is a special message just for you.', 'text/plain');
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com'])
+            ->setSubject('Hello there!')
+            ->setBody('This is a special message just for you.', 'text/plain');
 
         $expectedPayload = [
             'recipients' => [
@@ -188,11 +188,11 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_builds_the_payload_with_addresses_in_string_form()
     {
         $message = Message::newInstance()
-                          ->setFrom('me@domain.com')
-                          ->setReplyTo('noreply@domain.com')
-                          ->setTo('john@doe.com')
-                          ->setCc('jane@doe.com')
-                          ->setBcc('jake@doe.com');
+            ->setFrom('me@domain.com')
+            ->setReplyTo('noreply@domain.com')
+            ->setTo('john@doe.com')
+            ->setCc('jane@doe.com')
+            ->setBcc('jake@doe.com');
 
         $expectedPayload = [
             'recipients' => [
@@ -220,11 +220,11 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_builds_the_payload_with_addresses_and_names_in_string_form()
     {
         $message = Message::newInstance()
-                          ->setFrom('me@domain.com', 'Me')
-                          ->setReplyTo('noreply@domain.com', 'No Reply')
-                          ->setTo('john@doe.com', 'John')
-                          ->setCc('jane@doe.com', 'Jane')
-                          ->setBcc('jake@doe.com', 'Jake');
+            ->setFrom('me@domain.com', 'Me')
+            ->setReplyTo('noreply@domain.com', 'No Reply')
+            ->setTo('john@doe.com', 'John')
+            ->setCc('jane@doe.com', 'Jane')
+            ->setBcc('jake@doe.com', 'Jake');
 
         $expectedPayload = [
             'recipients' => [
@@ -252,11 +252,11 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_builds_the_payload_with_addresses_in_array_form()
     {
         $message = Message::newInstance()
-                          ->setFrom(['me@domain.com'])
-                          ->setReplyTo(['noreply@domain.com'])
-                          ->setTo(['john@doe.com'])
-                          ->setCc(['jane@doe.com'])
-                          ->setBcc(['jake@doe.com']);
+            ->setFrom(['me@domain.com'])
+            ->setReplyTo(['noreply@domain.com'])
+            ->setTo(['john@doe.com'])
+            ->setCc(['jane@doe.com'])
+            ->setBcc(['jake@doe.com']);
 
         $expectedPayload = [
             'recipients' => [
@@ -284,11 +284,11 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_builds_the_payload_with_addresses_and_names_in_array_form()
     {
         $message = Message::newInstance()
-                          ->setFrom(['me@domain.com' => 'Me'])
-                          ->setReplyTo(['noreply@domain.com' => 'No Reply'])
-                          ->setTo(['john@doe.com' => 'John'])
-                          ->setCc(['jane@doe.com' => 'Jane'])
-                          ->setBcc(['jake@doe.com' => 'Jake']);
+            ->setFrom(['me@domain.com' => 'Me'])
+            ->setReplyTo(['noreply@domain.com' => 'No Reply'])
+            ->setTo(['john@doe.com' => 'John'])
+            ->setCc(['jane@doe.com' => 'Jane'])
+            ->setBcc(['jake@doe.com' => 'Jake']);
 
         $expectedPayload = [
             'recipients' => [
@@ -316,14 +316,14 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_convertss_asterisk_pipe_variables_to_curly_braces()
     {
         $message = Message::newInstance()
-                          ->setFrom('me@domain.com')
-                          ->setTo(['john@doe.com'])
-                          ->setSubject('Hello there, *|NAME|*!')
-                          ->setBody(
-                              '<html><body><p>This is a special message just for you, *|NAME|*.</p></body></html>',
-                              'text/html'
-                          )
-                          ->addPart('This is a special message just for you, *|NAME|*.', 'text/plain');
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com'])
+            ->setSubject('Hello there, *|NAME|*!')
+            ->setBody(
+                '<html><body><p>This is a special message just for you, *|NAME|*.</p></body></html>',
+                'text/html'
+            )
+            ->addPart('This is a special message just for you, *|NAME|*.', 'text/plain');
 
         $expectedPayload = [
             'recipients' => [
@@ -351,7 +351,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_does_not_accept_a_message_without_real_recipients()
     {
         $message = Message::newInstance()
-                          ->setFrom('me@domain.com');
+            ->setFrom('me@domain.com');
 
         $this->payloadBuilder->buildPayload($message);
     }

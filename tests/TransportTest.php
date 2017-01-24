@@ -115,7 +115,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $this->transport->registerPlugin($eventListener->reveal());
 
         $this->eventDispatcher->bindEventListener($eventListener->reveal())
-                              ->shouldHaveBeenCalled();
+            ->shouldHaveBeenCalled();
     }
 
     /**
@@ -130,7 +130,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $this->whenTransmissionIsSentSuccessfully($payload);
 
         $event->setResult(Swift_Events_SendEvent::RESULT_SUCCESS)
-              ->shouldBeCalled();
+            ->shouldBeCalled();
 
         $this->thenSendPerformedEventIsDispatched($event);
 
@@ -151,7 +151,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $this->whenTransmissionIsSentSuccessfully($payload);
 
         $event->setResult(Swift_Events_SendEvent::RESULT_SUCCESS)
-              ->shouldBeCalled();
+            ->shouldBeCalled();
 
         $this->thenSendPerformedEventIsDispatched($event);
 
@@ -172,7 +172,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $this->whenAsynchronousTransmissionIsSentSuccessfully($payload);
 
         $event->setResult(Swift_Events_SendEvent::RESULT_SUCCESS)
-              ->shouldBeCalled();
+            ->shouldBeCalled();
 
         $this->thenSendPerformedEventIsDispatched($event);
 
@@ -228,7 +228,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $this->whenTransmissionIsSentUnsuccessfully($payload);
 
         $event->setResult(Swift_Events_SendEvent::RESULT_FAILED)
-              ->shouldBeCalled();
+            ->shouldBeCalled();
 
         $this->thenSendPerformedEventIsDispatched($event);
 
@@ -249,7 +249,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $this->whenTransmissionIsSentSuccessfully($payload, 0, 2);
 
         $event->setResult(Swift_Events_SendEvent::RESULT_FAILED)
-              ->shouldBeCalled();
+            ->shouldBeCalled();
 
         $this->thenSendPerformedEventIsDispatched($event);
 
@@ -270,7 +270,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $this->whenTransmissionIsSentSuccessfully($payload, 1, 1);
 
         $event->setResult(Swift_Events_SendEvent::RESULT_TENTATIVE)
-              ->shouldBeCalled();
+            ->shouldBeCalled();
 
         $this->thenSendPerformedEventIsDispatched($event);
 
@@ -288,7 +288,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
 
         $event = $this->whenBeforeSendPerformedEventIsDispatched($message);
         $event->bubbleCancelled()
-              ->willReturn(true);
+            ->willReturn(true);
 
         $sent = $this->transport->send($message);
 
@@ -305,16 +305,16 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $event = $this->prophesize(Swift_Events_SendEvent::class);
 
         $event->bubbleCancelled()
-              ->willReturn(false);
+            ->willReturn(false);
 
         $event->setFailedRecipients([])
-              ->willReturn();
+            ->willReturn();
 
         $this->eventDispatcher->createSendEvent($this->transport, $message)
-                              ->willReturn($event->reveal());
+            ->willReturn($event->reveal());
 
         $this->eventDispatcher->dispatchEvent($event->reveal(), 'beforeSendPerformed')
-                              ->shouldBeCalled();
+            ->shouldBeCalled();
 
         return $event;
     }
@@ -329,7 +329,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $payload = [];
 
         $this->payloadBuilder->buildPayload($message)
-                             ->willReturn($payload);
+            ->willReturn($payload);
 
         return $payload;
     }
@@ -340,7 +340,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
     private function whenBuildingPayloadFails(Swift_Mime_Message $message)
     {
         $this->payloadBuilder->buildPayload($message)
-                             ->willThrow(Exception::class);
+            ->willThrow(Exception::class);
     }
 
     /**
@@ -356,21 +356,21 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $response = $this->prophesize(SparkPostResponse::class);
 
         $response->getStatusCode()
-                 ->willReturn(200);
+            ->willReturn(200);
 
         $response->getBody()
-                 ->willReturn(
-                     [
-                         'results' => [
-                             'total_rejected_recipients' => $rejected,
-                             'total_accepted_recipients' => $accepted,
-                             'id'                        => '11668787484950529',
-                         ],
-                     ]
-                 );
+            ->willReturn(
+                [
+                    'results' => [
+                        'total_rejected_recipients' => $rejected,
+                        'total_accepted_recipients' => $accepted,
+                        'id'                        => '11668787484950529',
+                    ],
+                ]
+            );
 
         $this->sparkpostTransmission->post($payload)
-                                    ->willReturn($response->reveal());
+            ->willReturn($response->reveal());
 
         return $response;
     }
@@ -386,23 +386,23 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $response = $this->prophesize(SparkPostResponse::class);
 
         $response->getStatusCode()
-                 ->willReturn(400);
+            ->willReturn(400);
 
         $response->getBody()
-                 ->willReturn(
-                     [
-                         'errors' => [
-                             [
-                                 'description' => 'Unconfigured or unverified sending domain.',
-                                 'code'        => '7001',
-                                 'message'     => 'Invalid domain',
-                             ],
-                         ],
-                     ]
-                 );
+            ->willReturn(
+                [
+                    'errors' => [
+                        [
+                            'description' => 'Unconfigured or unverified sending domain.',
+                            'code'        => '7001',
+                            'message'     => 'Invalid domain',
+                        ],
+                    ],
+                ]
+            );
 
         $this->sparkpostTransmission->post($payload)
-                                    ->willReturn($response->reveal());
+            ->willReturn($response->reveal());
 
         return $response;
     }
@@ -418,27 +418,27 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $response = $this->prophesize(SparkPostResponse::class);
 
         $response->getStatusCode()
-                 ->willReturn(200);
+            ->willReturn(200);
 
         $response->getBody()
-                 ->willReturn(
-                     [
-                         'results' => [
-                             'total_rejected_recipients' => 0,
-                             'total_accepted_recipients' => 2,
-                             'id'                        => '11668787484950529',
-                         ],
-                     ]
-                 );
+            ->willReturn(
+                [
+                    'results' => [
+                        'total_rejected_recipients' => 0,
+                        'total_accepted_recipients' => 2,
+                        'id'                        => '11668787484950529',
+                    ],
+                ]
+            );
 
         /** @var SparkPostResponse|ObjectProphecy $response */
         $promise = $this->prophesize(SparkPostPromise::class);
 
         $promise->wait()
-                ->willReturn($response->reveal());
+            ->willReturn($response->reveal());
 
         $this->sparkpostTransmission->post($payload)
-                                    ->willReturn($promise->reveal());
+            ->willReturn($promise->reveal());
 
         return $response;
     }
@@ -449,7 +449,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
     private function whenSendingTransmissionFails(array $payload)
     {
         $this->sparkpostTransmission->post($payload)
-                                    ->willThrow(Exception::class);
+            ->willThrow(Exception::class);
     }
 
     /**
@@ -458,19 +458,19 @@ final class TransportTest extends PHPUnit_Framework_TestCase
     private function thenSendPerformedEventIsDispatched(ObjectProphecy $event)
     {
         $this->eventDispatcher->dispatchEvent($event->reveal(), 'sendPerformed')
-                              ->shouldBeCalled();
+            ->shouldBeCalled();
     }
 
     private function thenExceptionThrownIsDispatched()
     {
         $this->eventDispatcher->createTransportExceptionEvent($this->transport, Arg::type('Swift_TransportException'))
-                              ->will(
-                                  function (array $args) {
-                                      return new Swift_Events_TransportExceptionEvent($args[0], $args[1]);
-                                  }
-                              );
+            ->will(
+                function (array $args) {
+                    return new Swift_Events_TransportExceptionEvent($args[0], $args[1]);
+                }
+            );
 
         $this->eventDispatcher->dispatchEvent(Arg::type('Swift_Events_TransportExceptionEvent'), 'exceptionThrown')
-                              ->shouldBeCalled();
+            ->shouldBeCalled();
     }
 }
