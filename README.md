@@ -22,7 +22,7 @@ Usage
 -----
 
 ```php
-$transport = SwiftSparkPost\Transport::newInstance('API-KEY', $payload);
+$transport = SwiftSparkPost\Transport::newInstance('API-KEY');
 $mailer    = Swift_Mailer::newInstance($transport);
 
 $message = SwiftSparkPost\Message::newInstance()
@@ -41,6 +41,15 @@ $message = SwiftSparkPost\Message::newInstance()
 
 $sent = $mailer->send($message);
 ```
+
+You can optionally provide a recipient override.
+
+```php
+$transport = SwiftSparkPost\Transport::newInstance('API-KEY', 'override@domain.com');
+```
+
+All `To`, `Cc` and `Bcc` email addresses will be overriden,
+in a way that `john@doe.com` becomes `override+john-doe-com@domain.com`.
 
 License
 -------
