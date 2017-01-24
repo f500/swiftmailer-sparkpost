@@ -1,6 +1,10 @@
 SwiftMailer SparkPost Transport
 ===============================
 
+[![Build Status](https://scrutinizer-ci.com/g/f500/swiftmailer-sparkpost/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/f500/swiftmailer-sparkpost/build-status/develop)
+[![Code Coverage](https://scrutinizer-ci.com/g/f500/swiftmailer-sparkpost/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/f500/swiftmailer-sparkpost/?branch=develop)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/f500/swiftmailer-sparkpost/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/f500/swiftmailer-sparkpost/?branch=develop)
+
 A [SwiftMailer][1] transport implementation for the [SparkPost API][2].
 
 It uses the official [SparkPost PHP library][3].
