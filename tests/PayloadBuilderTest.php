@@ -350,4 +350,113 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
 
         $this->payloadBuilder->buildPayload($message);
     }
+
+    /**
+     * @test
+     */
+    public function it_overrides_recipients_when_configured_to_do_so()
+    {
+        $payloadBuilder = new PayloadBuilder('override@domain.com');
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com', 'Me')
+            ->setReplyTo('noreply@domain.com', 'No Reply')
+            ->setTo(['john@doe.com' => 'John', 'jack@doe.com' => 'Jack'])
+            ->setCc(['jane@doe.com' => 'Jane', 'jamie@doe.com' => 'Jamie'])
+            ->setBcc(['jake@doe.com' => 'Jake', 'joe@doe.com' => 'Joe']);
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'override+john-doe-com@domain.com', 'name' => 'John']],
+
+                ['address' => ['email' => 'override+jack-doe-com@domain.com', 'name' => 'Jack'],],
+                ['address' => ['email' => 'override+jane-doe-com@domain.com', 'name' => 'Jane']],
+                ['address' => ['email' => 'override+jamie-doe-com@domain.com', 'name' => 'Jamie']],
+                [
+                    'address' => [
+                        'email'     => 'override+jake-doe-com@domain.com',
+                        'name'      => 'Jake',
+                        'header_to' => 'override+john-doe-com@domain.com',
+                    ],
+                ],
+                [
+                    'address' => [
+                        'email'     => 'override+joe-doe-com@domain.com',
+                        'name'      => 'Joe',
+                        'header_to' => 'override+john-doe-com@domain.com',
+                    ],
+                ],
+            ],
+            'content'    => [
+                'subject'  => '',
+                'from'     => ['email' => 'me@domain.com', 'name' => 'Me'],
+                'reply_to' => 'noreply@domain.com',
+                'text'     => '',
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_keeps_track_of_substitution_data_when_overriding_recipients()
+    {
+        $payloadBuilder = new PayloadBuilder('override@domain.com');
+
+        $message = Message::newInstance();
+        $message->setFrom('me@domain.com', 'Me');
+        $message->setReplyTo('noreply@domain.com', 'No Reply');
+        $message->setTo('john@doe.com', 'John');
+        $message->setCc('jane@doe.com', 'Jane');
+        $message->setBcc('jake@doe.com', 'Jake');
+        $message->setPerRecipientTags('john@doe.com', ['eget', 'bibendum']);
+        $message->setPerRecipientMetadata('jane@doe.com', ['adipiscing' => 'elit', 'donec' => 'vitae']);
+        $message->setPerRecipientSubstitutionData('jake@doe.com', ['rutrum' => 'sed', 'vel' => 'nunc']);
+
+        $expectedPayload = [
+            'recipients' => [
+                [
+                    'address' => ['email' => 'override+john-doe-com@domain.com', 'name' => 'John'],
+                    'tags'    => ['eget', 'bibendum'],
+                ],
+                [
+                    'address'  => ['email' => 'override+jane-doe-com@domain.com', 'name' => 'Jane'],
+                    'metadata' => ['adipiscing' => 'elit', 'donec' => 'vitae'],
+                ],
+                [
+                    'address'           => [
+                        'email'     => 'override+jake-doe-com@domain.com',
+                        'name'      => 'Jake',
+                        'header_to' => 'override+john-doe-com@domain.com',
+                    ],
+                    'substitution_data' => ['rutrum' => 'sed', 'vel' => 'nunc'],
+                ],
+            ],
+            'content'    => [
+                'subject'  => '',
+                'from'     => ['email' => 'me@domain.com', 'name' => 'Me'],
+                'reply_to' => 'noreply@domain.com',
+                'text'     => '',
+            ],
+            'options'    => ['transactional' => true, 'inline_css' => true],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     * @expectedException \SwiftSparkPost\Exception
+     * @expectedExceptionMessage Recipient override must be a valid email address
+     */
+    public function it_does_not_accept_an_invalid_recipient_override()
+    {
+        new PayloadBuilder('invalid email');
+    }
 }
