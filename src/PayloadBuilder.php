@@ -18,6 +18,35 @@ use Swift_MimePart;
 final class PayloadBuilder implements PayloadBuilderInterface
 {
     /**
+     * @var string
+     */
+    private $overridePart1;
+
+    /**
+     * @var string
+     */
+    private $overridePart2;
+
+    /**
+     * @param string $recipientOverride
+     *
+     * @throws Exception
+     */
+    public function __construct($recipientOverride = '')
+    {
+        $this->overridePart1 = '';
+        $this->overridePart2 = '';
+
+        if ($recipientOverride) {
+            if (!filter_var($recipientOverride, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception('Recipient override must be a valid email address');
+            }
+
+            list($this->overridePart1, $this->overridePart2) = explode('@', $recipientOverride);
+        }
+    }
+
+    /**
      * @param Swift_Mime_Message $message
      *
      * @return array
@@ -106,7 +135,7 @@ final class PayloadBuilder implements PayloadBuilderInterface
         array $substitutionData,
         $originalEmail = ''
     ) {
-        $recipient = ['address' => ['email' => $email]];
+        $recipient = ['address' => ['email' => $this->overrideRecipient($email)]];
 
         if ($name) {
             $recipient['address']['name'] = $name;
@@ -332,5 +361,24 @@ final class PayloadBuilder implements PayloadBuilderInterface
         $rp = $ro->getProperty('_userContentType');
         $rp->setAccessible(true);
         return (string) $rp->getValue($message);
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return string
+     */
+    private function overrideRecipient($email)
+    {
+        if (!$this->overridePart1 || !$this->overridePart2) {
+            return $email;
+        }
+
+        return sprintf(
+            '%s+%s@%s',
+            $this->overridePart1,
+            trim(preg_replace('/([^a-z0-9]+)/i', '-', $email), '-'),
+            $this->overridePart2
+        );
     }
 }
