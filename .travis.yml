@@ -1,0 +1,26 @@
+language: php
+
+php:
+  - 5.6
+  - 7.0
+  - 7.1
+
+before_install:
+  - composer selfupdate
+
+install:
+  - composer install --no-interaction --no-progress --prefer-dist
+
+script:
+  - vendor/bin/phpunit --coverage-text --coverage-clover=build/logs/clover.xml
+  - vendor/bin/phpcs --report=full --standard=PSR2 --encoding=utf-8 src
+
+after_script:
+  - tests/upload-coverage.sh
+
+cache:
+  directories:
+    - vendor
+
+notifications:
+  email: jasper@future500.nl
