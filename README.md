@@ -25,6 +25,18 @@ Usage
 $transport = SwiftSparkPost\Transport::newInstance('API-KEY');
 $mailer    = Swift_Mailer::newInstance($transport);
 
+$message = Swift_Message::newInstance()
+    ->setFrom('me@domain.com', 'Me')
+    ->setTo(['john@doe.com' => 'John Doe', 'jane@doe.com'])
+    ->setSubject('...')
+    ->setBody('...');
+
+$sent = $mailer->send($message);
+```
+
+### Specialized messages
+
+```php
 $message = SwiftSparkPost\Message::newInstance()
     ->setFrom('me@domain.com', 'Me')
     ->setTo(['john@doe.com' => 'John Doe', 'jane@doe.com'])
@@ -38,30 +50,57 @@ $message = SwiftSparkPost\Message::newInstance()
     ->setSubstitutionData(['...' => '...'])
     ->setPerRecipientSubstitutionData('john@doe.com', ['...' => '...'])
     ->setOptions(['...']);
-
-$sent = $mailer->send($message);
 ```
 
-#### Override recipients
+### Configuration
 
-You can override recipients by passing a configuration object.
-The email address will be overridden, other properties (like name, tags, etc) won't be touched.
+```php
+$config    = SwiftSparkPost\Configuration::newInstance();
+$transport = SwiftSparkPost\Transport::newInstance('API-KEY', $config);
+$mailer    = Swift_Mailer::newInstance($transport);
+```
+
+### Override recipients
+
+Override all `To`, `Cc` and `Bcc` addresses, but leave name and per-recipient properties intact.
+
+`john@doe.com` becomes `override@domain.com`.
 
 ```php
 $config = SwiftSparkPost\Configuration::newInstance()
     ->setRecipientOverride('override@domain.com');
-
-$transport = SwiftSparkPost\Transport::newInstance('API-KEY', $config);
 ```
 
-You can use Gmail style overrides, so that `john@doe.com` will become `override+john-doe-com@domain.com`.
+#### Gmail style
+
+`john@doe.com` becomes `override+john-doe-com@domain.com`.
 
 ```php
 $config = SwiftSparkPost\Configuration::newInstance()
     ->setRecipientOverride('override@domain.com')
     ->setOverrideGmailStyle(true);
+```
 
-$transport = SwiftSparkPost\Transport::newInstance('API-KEY', $config);
+### Options for all messages
+
+```php
+$config = SwiftSparkPost\Configuration::newInstance()
+    ->setOptions([
+        Configuration::OPT_TRANSACTIONAL    => false,
+        Configuration::OPT_OPEN_TRACKING    => false,
+        Configuration::OPT_CLICK_TRACKING   => false,
+        Configuration::OPT_SANDBOX          => true,
+        Configuration::OPT_SKIP_SUPPRESSION => true,
+        Configuration::OPT_INLINE_CSS       => true,
+        Configuration::OPT_IP_POOL          => 'some-ip-pool',
+    ]);
+```
+
+These options are also available for messages, where they take precedence over the configured options.
+
+```php
+$message = SwiftSparkPost\Message::newInstance()
+    ->setOptions(['...']);
 ```
 
 License
