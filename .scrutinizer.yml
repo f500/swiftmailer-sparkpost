@@ -1,12 +1,39 @@
 checks:
-  php:
-    code_rating: true
-    duplication: true
+    php:
+        code_rating: true
+        duplication: true
+
+        align_assignments: true
+        avoid_fixme_comments: true
+        avoid_multiple_statements_on_same_line: true
+        avoid_perl_style_comments: true
+        avoid_todo_comments: true
+        avoid_unnecessary_concatenation: true
+        check_method_contracts:
+            verify_interface_like_constraints: true
+            verify_documented_constraints: true
+            verify_parent_constraints: true
+        classes_in_camel_caps: true
+        encourage_postdec_operator: true
+        encourage_single_quotes: true
+        function_in_camel_caps: true
+        newline_at_end_of_file: true
+        optional_parameters_at_the_end: true
+        overriding_parameter: true
+        parameter_doc_comments: true
+        parameters_in_camelcaps: true
+        prefer_while_loop_over_for_loop: true
+        properties_in_camelcaps: true
+        return_doc_comment_if_not_inferrable: true
+        return_doc_comments: true
+        simplify_boolean_return: true
+        uppercase_constants: true
+        use_self_instead_of_fqcn: true
 
 filter:
-  paths: [src/*]
+    paths: [src/*]
 
 tools:
-  external_code_coverage:
-    timeout: 600
-    runs: 3
+    external_code_coverage:
+        timeout: 600
+        runs: 3
