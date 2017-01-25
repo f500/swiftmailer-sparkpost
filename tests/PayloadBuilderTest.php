@@ -12,8 +12,8 @@ use Swift_Attachment;
 use Swift_Message;
 use SwiftSparkPost\Configuration;
 use SwiftSparkPost\Message;
-use SwiftSparkPost\PayloadBuilder;
 use SwiftSparkPost\RandomNumberGenerator;
+use SwiftSparkPost\StandardPayloadBuilder;
 
 /**
  * @copyright Future500 B.V.
@@ -22,7 +22,7 @@ use SwiftSparkPost\RandomNumberGenerator;
 final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var PayloadBuilder
+     * @var StandardPayloadBuilder
      */
     private $payloadBuilder;
 
@@ -35,7 +35,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     {
         $this->randomNumberGenerator = $this->prophesize(RandomNumberGenerator::class);
 
-        $this->payloadBuilder = new PayloadBuilder(
+        $this->payloadBuilder = new StandardPayloadBuilder(
             new Configuration(),
             $this->randomNumberGenerator->reveal()
         );
@@ -388,7 +388,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         $config = Configuration::newInstance()
             ->setRecipientOverride('override@domain.com');
 
-        $payloadBuilder = new PayloadBuilder(
+        $payloadBuilder = new StandardPayloadBuilder(
             $config,
             $this->randomNumberGenerator->reveal()
         );
@@ -446,7 +446,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         $config = Configuration::newInstance()
             ->setRecipientOverride('override@domain.com');
 
-        $payloadBuilder = new PayloadBuilder(
+        $payloadBuilder = new StandardPayloadBuilder(
             $config,
             $this->randomNumberGenerator->reveal()
         );
@@ -505,7 +505,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ->setRecipientOverride('override@domain.com')
             ->setOverrideGmailStyle(true);
 
-        $payloadBuilder = new PayloadBuilder(
+        $payloadBuilder = new StandardPayloadBuilder(
             $config,
             $this->randomNumberGenerator->reveal()
         );
@@ -564,7 +564,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ->setRecipientOverride('override@domain.com')
             ->setOverrideGmailStyle(true);
 
-        $payloadBuilder = new PayloadBuilder(
+        $payloadBuilder = new StandardPayloadBuilder(
             $config,
             $this->randomNumberGenerator->reveal()
         );
@@ -632,7 +632,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 ]
             );
 
-        $payloadBuilder = new PayloadBuilder(
+        $payloadBuilder = new StandardPayloadBuilder(
             $config,
             $this->randomNumberGenerator->reveal()
         );
@@ -673,7 +673,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     {
         $config = Configuration::newInstance();
 
-        $payloadBuilder = new PayloadBuilder(
+        $payloadBuilder = new StandardPayloadBuilder(
             $config,
             $this->randomNumberGenerator->reveal()
         );
@@ -723,7 +723,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 ]
             );
 
-        $payloadBuilder = new PayloadBuilder(
+        $payloadBuilder = new StandardPayloadBuilder(
             $config,
             $this->randomNumberGenerator->reveal()
         );
@@ -777,7 +777,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
             ->setIpPoolProbability(0);
 
-        $payloadBuilder = new PayloadBuilder(
+        $payloadBuilder = new StandardPayloadBuilder(
             $config,
             $this->randomNumberGenerator->reveal()
         );
@@ -817,7 +817,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
             ->setIpPoolProbability(0.5);
 
-        $payloadBuilder = new PayloadBuilder(
+        $payloadBuilder = new StandardPayloadBuilder(
             $config,
             $this->randomNumberGenerator->reveal()
         );
@@ -857,7 +857,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
             ->setIpPoolProbability(0.5);
 
-        $payloadBuilder = new PayloadBuilder(
+        $payloadBuilder = new StandardPayloadBuilder(
             $config,
             $this->randomNumberGenerator->reveal()
         );
