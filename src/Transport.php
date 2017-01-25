@@ -53,7 +53,8 @@ final class Transport implements Swift_Transport
         }
 
         $eventDispatcher       = Swift_DependencyContainer::getInstance()->lookup('transport.eventdispatcher');
-        $sparkpost             = new SparkPost(new GuzzleAdapter(new GuzzleClient()), ['key' => $apiKey]);
+        $guzzle                = new GuzzleAdapter(new GuzzleClient(['timeout' => 300]));
+        $sparkpost             = new SparkPost($guzzle, ['key' => $apiKey]);
         $randomNumberGenerator = new MtRandomNumberGenerator();
         $payloadBuilder        = new StandardPayloadBuilder($config, $randomNumberGenerator);
 
