@@ -50,14 +50,7 @@ final class Message extends Swift_Message
     private $options;
 
     /**
-     * Create a new Message.
-     *
-     * @param string $subject
-     * @param string $body
-     * @param string $contentType
-     * @param string $charset
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public static function newInstance($subject = null, $body = null, $contentType = null, $charset = null)
     {
