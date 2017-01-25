@@ -565,4 +565,37 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($expectedPayload, $actualPayload);
     }
+
+    /**
+     * @test
+     */
+    public function changing_configuration_after_supplying_it_has_no_effect()
+    {
+        $config         = Configuration::newInstance();
+        $payloadBuilder = new PayloadBuilder($config);
+
+        $config
+            ->setRecipientOverride('override@domain.com');
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com'])
+            ->setSubject('Hello there!')
+            ->setBody('This is a special message just for you.', 'text/plain');
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => 'Hello there!',
+                'from'    => 'me@domain.com',
+                'text'    => 'This is a special message just for you.',
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
 }

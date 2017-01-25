@@ -27,7 +27,7 @@ final class PayloadBuilder implements PayloadBuilderInterface
      */
     public function __construct(Configuration $config)
     {
-        $this->config = $config;
+        $this->config = clone $config;
     }
 
     /**
