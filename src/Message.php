@@ -174,7 +174,7 @@ final class Message extends Swift_Message
      */
     public function setSubstitutionData(array $substitutionData)
     {
-        $this->substitutionData = $this->sanitizeubstitutionData($substitutionData);
+        $this->substitutionData = $this->sanitizeSubstitutionData($substitutionData);
 
         return $this;
     }
@@ -195,7 +195,7 @@ final class Message extends Swift_Message
      */
     public function setPerRecipientSubstitutionData($recipient, array $substitutionData)
     {
-        $this->perRecipientSubstitutionData[(string) $recipient] = $this->sanitizeubstitutionData($substitutionData);
+        $this->perRecipientSubstitutionData[(string) $recipient] = $this->sanitizeSubstitutionData($substitutionData);
 
         return $this;
     }
@@ -260,7 +260,7 @@ final class Message extends Swift_Message
      *
      * @return array
      */
-    private function sanitizeubstitutionData(array $substitutionData)
+    private function sanitizeSubstitutionData(array $substitutionData)
     {
         $sanitized = [];
 
