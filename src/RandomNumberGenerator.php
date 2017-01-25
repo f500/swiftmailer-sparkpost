@@ -6,18 +6,16 @@
 
 namespace SwiftSparkPost;
 
-use Swift_Mime_Message;
-
 /**
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-interface PayloadBuilder
+interface RandomNumberGenerator
 {
     /**
-     * @param Swift_Mime_Message $message
+     * Returns a random number between 0 and 1.
      *
-     * @return array
+     * @return float
      */
-    public function buildPayload(Swift_Mime_Message $message);
+    public function generate();
 }

@@ -6,18 +6,17 @@
 
 namespace SwiftSparkPost;
 
-use Swift_Mime_Message;
-
 /**
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-interface PayloadBuilderInterface
+final class MtRandomNumberGenerator implements RandomNumberGenerator
 {
     /**
-     * @param Swift_Mime_Message $message
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    public function buildPayload(Swift_Mime_Message $message);
+    public function generate()
+    {
+        return (mt_rand() / mt_getrandmax());
+    }
 }

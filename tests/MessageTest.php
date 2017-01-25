@@ -10,6 +10,7 @@ use PHPUnit_Framework_TestCase;
 use stdClass;
 use Swift_Message;
 use Swift_Mime_Message;
+use SwiftSparkPost\Configuration;
 use SwiftSparkPost\Message;
 
 /**
@@ -33,7 +34,7 @@ final class MessageTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_represents_a_swift_message()
+    public function it_is_an_extension_of_a_Swift_Message()
     {
         $message = new Message();
 
@@ -64,22 +65,7 @@ final class MessageTest extends PHPUnit_Framework_TestCase
         $this->assertSame([], $message->getPerRecipientMetadata());
         $this->assertSame([], $message->getSubstitutionData());
         $this->assertSame([], $message->getPerRecipientSubstitutionData());
-    }
-
-    /**
-     * @test
-     */
-    public function it_is_transactional_and_inlines_css_by_default()
-    {
-        $message = new Message();
-
-        $this->assertSame(
-            [
-                'transactional' => true,
-                'inline_css'    => true,
-            ],
-            $message->getOptions()
-        );
+        $this->assertSame([], $message->getOptions());
     }
 
     /**
@@ -216,13 +202,13 @@ final class MessageTest extends PHPUnit_Framework_TestCase
     public function it_has_Options_when_provided()
     {
         $options = [
-            'open_tracking'    => false,
-            'click_tracking'   => false,
-            'transactional'    => false,
-            'sandbox'          => true,
-            'skip_suppression' => true,
-            'inline_css'       => false,
-            'ip_pool'          => 'some-ip-pool',
+            Configuration::OPT_TRANSACTIONAL    => false,
+            Configuration::OPT_OPEN_TRACKING    => false,
+            Configuration::OPT_CLICK_TRACKING   => false,
+            Configuration::OPT_SANDBOX          => true,
+            Configuration::OPT_SKIP_SUPPRESSION => true,
+            Configuration::OPT_INLINE_CSS       => true,
+            Configuration::OPT_IP_POOL          => 'some-ip-pool',
         ];
 
         $message = new Message();
@@ -236,7 +222,7 @@ final class MessageTest extends PHPUnit_Framework_TestCase
      * @expectedException \SwiftSparkPost\Exception
      * @expectedExceptionMessage Unknown SparkPost option "unknown_option"
      */
-    public function it_does_not_accept_unknown_options()
+    public function it_does_not_accept_an_unknown_option()
     {
         $message = new Message();
         $message->setOptions(['unknown_option' => 'ullamcorper']);

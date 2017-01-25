@@ -21,7 +21,7 @@ use Swift_Message;
 use Swift_Mime_Message;
 use SwiftSparkPost\Exception;
 use SwiftSparkPost\Message;
-use SwiftSparkPost\PayloadBuilderInterface;
+use SwiftSparkPost\PayloadBuilder;
 use SwiftSparkPost\Transport;
 
 /**
@@ -46,7 +46,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
     private $sparkpostTransmission;
 
     /**
-     * @var PayloadBuilderInterface|ObjectProphecy
+     * @var PayloadBuilder|ObjectProphecy
      */
     private $payloadBuilder;
 
@@ -60,7 +60,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $this->eventDispatcher       = $this->prophesize(Swift_Events_EventDispatcher::class);
         $this->sparkpost             = $this->prophesize(SparkPost::class);
         $this->sparkpostTransmission = $this->prophesize(Transmission::class);
-        $this->payloadBuilder        = $this->prophesize(PayloadBuilderInterface::class);
+        $this->payloadBuilder        = $this->prophesize(PayloadBuilder::class);
 
         $this->sparkpost->transmissions = $this->sparkpostTransmission->reveal();
 

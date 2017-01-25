@@ -7,11 +7,13 @@
 namespace SwiftSparkPost\Tests;
 
 use PHPUnit_Framework_TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Swift_Attachment;
 use Swift_Message;
+use SwiftSparkPost\Configuration;
 use SwiftSparkPost\Message;
-use SwiftSparkPost\PayloadBuilder;
-use SwiftSparkPost\PayloadBuilderInterface;
+use SwiftSparkPost\RandomNumberGenerator;
+use SwiftSparkPost\StandardPayloadBuilder;
 
 /**
  * @copyright Future500 B.V.
@@ -20,13 +22,23 @@ use SwiftSparkPost\PayloadBuilderInterface;
 final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var PayloadBuilderInterface
+     * @var StandardPayloadBuilder
      */
     private $payloadBuilder;
 
+    /**
+     * @var RandomNumberGenerator|ObjectProphecy
+     */
+    private $randomNumberGenerator;
+
     protected function setUp()
     {
-        $this->payloadBuilder = new PayloadBuilder();
+        $this->randomNumberGenerator = $this->prophesize(RandomNumberGenerator::class);
+
+        $this->payloadBuilder = new StandardPayloadBuilder(
+            new Configuration(),
+            $this->randomNumberGenerator->reveal()
+        );
     }
 
     protected function tearDown()
@@ -54,6 +66,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'from'    => 'me@domain.com',
                 'text'    => 'This is a special message just for you.',
             ],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $this->payloadBuilder->buildPayload($message);
@@ -64,7 +79,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_builds_the_same_payload_with_default_options_for_an_extended_message()
+    public function it_builds_the_same_payload_for_an_extended_message()
     {
         $message = Message::newInstance()
             ->setFrom('me@domain.com')
@@ -83,7 +98,6 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ],
             'options'    => [
                 'transactional' => true,
-                'inline_css'    => true,
             ],
         ];
 
@@ -122,13 +136,13 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         $message->setPerRecipientSubstitutionData('jane@doe.com', ['mollis' => 'luctus']);
         $message->setOptions(
             [
-                'open_tracking'    => false,
-                'click_tracking'   => false,
-                'transactional'    => false,
-                'sandbox'          => true,
-                'skip_suppression' => true,
-                'inline_css'       => false,
-                'ip_pool'          => 'some-ip-pool',
+                Configuration::OPT_TRANSACTIONAL    => false,
+                Configuration::OPT_OPEN_TRACKING    => false,
+                Configuration::OPT_CLICK_TRACKING   => false,
+                Configuration::OPT_SANDBOX          => true,
+                Configuration::OPT_SKIP_SUPPRESSION => true,
+                Configuration::OPT_INLINE_CSS       => true,
+                Configuration::OPT_IP_POOL          => 'some-ip-pool',
             ]
         );
 
@@ -167,12 +181,12 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             'metadata'          => ['lorem' => 'ipsum', 'dolor' => 'sit', 'amet' => 'consectetur'],
             'substitution_data' => ['aenean' => 'pretium', 'sapien' => 'nec', 'eros' => 'ullamcorper'],
             'options'           => [
+                'transactional'    => false,
                 'open_tracking'    => false,
                 'click_tracking'   => false,
-                'transactional'    => false,
                 'sandbox'          => true,
                 'skip_suppression' => true,
-                'inline_css'       => false,
+                'inline_css'       => true,
                 'ip_pool'          => 'some-ip-pool',
             ],
         ];
@@ -206,6 +220,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
             ],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $this->payloadBuilder->buildPayload($message);
@@ -236,6 +253,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'from'     => ['email' => 'me@domain.com', 'name' => 'Me'],
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
+            ],
+            'options'    => [
+                'transactional' => true,
             ],
         ];
 
@@ -268,6 +288,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
             ],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $this->payloadBuilder->buildPayload($message);
@@ -298,6 +321,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'from'     => ['email' => 'me@domain.com', 'name' => 'Me'],
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
+            ],
+            'options'    => [
+                'transactional' => true,
             ],
         ];
 
@@ -331,6 +357,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'html'    => '<html><body><p>This is a special message just for you, {{NAME}}.</p></body></html>',
                 'text'    => 'This is a special message just for you, {{NAME}}.',
             ],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $this->payloadBuilder->buildPayload($message);
@@ -356,7 +385,130 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     public function it_overrides_recipients_when_configured_to_do_so()
     {
-        $payloadBuilder = new PayloadBuilder('override@domain.com');
+        $config = Configuration::newInstance()
+            ->setRecipientOverride('override@domain.com');
+
+        $payloadBuilder = new StandardPayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com', 'Me')
+            ->setReplyTo('noreply@domain.com', 'No Reply')
+            ->setTo(['john@doe.com' => 'John', 'jack@doe.com' => 'Jack'])
+            ->setCc(['jane@doe.com' => 'Jane', 'jamie@doe.com' => 'Jamie'])
+            ->setBcc(['jake@doe.com' => 'Jake', 'joe@doe.com' => 'Joe']);
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'override@domain.com', 'name' => 'John']],
+
+                ['address' => ['email' => 'override@domain.com', 'name' => 'Jack'],],
+                ['address' => ['email' => 'override@domain.com', 'name' => 'Jane']],
+                ['address' => ['email' => 'override@domain.com', 'name' => 'Jamie']],
+                [
+                    'address' => [
+                        'email'     => 'override@domain.com',
+                        'name'      => 'Jake',
+                        'header_to' => 'override@domain.com',
+                    ],
+                ],
+                [
+                    'address' => [
+                        'email'     => 'override@domain.com',
+                        'name'      => 'Joe',
+                        'header_to' => 'override@domain.com',
+                    ],
+                ],
+            ],
+            'content'    => [
+                'subject'  => '',
+                'from'     => ['email' => 'me@domain.com', 'name' => 'Me'],
+                'reply_to' => 'noreply@domain.com',
+                'text'     => '',
+            ],
+            'options'    => [
+                'transactional' => true,
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_keeps_track_of_substitution_data_when_overriding_recipients()
+    {
+        $config = Configuration::newInstance()
+            ->setRecipientOverride('override@domain.com');
+
+        $payloadBuilder = new StandardPayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $message = Message::newInstance();
+        $message->setFrom('me@domain.com', 'Me');
+        $message->setReplyTo('noreply@domain.com', 'No Reply');
+        $message->setTo('john@doe.com', 'John');
+        $message->setCc('jane@doe.com', 'Jane');
+        $message->setBcc('jake@doe.com', 'Jake');
+        $message->setPerRecipientTags('john@doe.com', ['eget', 'bibendum']);
+        $message->setPerRecipientMetadata('jane@doe.com', ['adipiscing' => 'elit', 'donec' => 'vitae']);
+        $message->setPerRecipientSubstitutionData('jake@doe.com', ['rutrum' => 'sed', 'vel' => 'nunc']);
+
+        $expectedPayload = [
+            'recipients' => [
+                [
+                    'address' => ['email' => 'override@domain.com', 'name' => 'John'],
+                    'tags'    => ['eget', 'bibendum'],
+                ],
+                [
+                    'address'  => ['email' => 'override@domain.com', 'name' => 'Jane'],
+                    'metadata' => ['adipiscing' => 'elit', 'donec' => 'vitae'],
+                ],
+                [
+                    'address'           => [
+                        'email'     => 'override@domain.com',
+                        'name'      => 'Jake',
+                        'header_to' => 'override@domain.com',
+                    ],
+                    'substitution_data' => ['rutrum' => 'sed', 'vel' => 'nunc'],
+                ],
+            ],
+            'content'    => [
+                'subject'  => '',
+                'from'     => ['email' => 'me@domain.com', 'name' => 'Me'],
+                'reply_to' => 'noreply@domain.com',
+                'text'     => '',
+            ],
+            'options'    => [
+                'transactional' => true,
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_overrides_recipients_Gmail_style_when_configured_to_do_so()
+    {
+        $config = Configuration::newInstance()
+            ->setRecipientOverride('override@domain.com')
+            ->setOverrideGmailStyle(true);
+
+        $payloadBuilder = new StandardPayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
 
         $message = Swift_Message::newInstance()
             ->setFrom('me@domain.com', 'Me')
@@ -393,6 +545,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
             ],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $payloadBuilder->buildPayload($message);
@@ -403,9 +558,16 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_keeps_track_of_substitution_data_when_overriding_recipients()
+    public function it_keeps_track_of_substitution_data_when_overriding_recipients_Gmail_style()
     {
-        $payloadBuilder = new PayloadBuilder('override@domain.com');
+        $config = Configuration::newInstance()
+            ->setRecipientOverride('override@domain.com')
+            ->setOverrideGmailStyle(true);
+
+        $payloadBuilder = new StandardPayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
 
         $message = Message::newInstance();
         $message->setFrom('me@domain.com', 'Me');
@@ -442,7 +604,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
             ],
-            'options'    => ['transactional' => true, 'inline_css' => true],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $payloadBuilder->buildPayload($message);
@@ -452,11 +616,276 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage Recipient override must be a valid email address
      */
-    public function it_does_not_accept_an_invalid_recipient_override()
+    public function it_uses_configured_options()
     {
-        new PayloadBuilder('invalid email');
+        $config = Configuration::newInstance()
+            ->setOptions(
+                [
+                    Configuration::OPT_TRANSACTIONAL    => false,
+                    Configuration::OPT_OPEN_TRACKING    => false,
+                    Configuration::OPT_CLICK_TRACKING   => false,
+                    Configuration::OPT_SANDBOX          => true,
+                    Configuration::OPT_SKIP_SUPPRESSION => true,
+                    Configuration::OPT_INLINE_CSS       => true,
+                    Configuration::OPT_IP_POOL          => 'some-ip-pool',
+                ]
+            );
+
+        $payloadBuilder = new StandardPayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com']);
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional'    => false,
+                'open_tracking'    => false,
+                'click_tracking'   => false,
+                'sandbox'          => true,
+                'skip_suppression' => true,
+                'inline_css'       => true,
+                'ip_pool'          => 'some-ip-pool',
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_is_not_affected_by_changes_to_configuration_after_being_supplied()
+    {
+        $config = Configuration::newInstance();
+
+        $payloadBuilder = new StandardPayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $config
+            ->setRecipientOverride('override@domain.com')
+            ->setOptions([Configuration::OPT_TRANSACTIONAL => false]);
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com']);
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional' => true,
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_overrides_configured_options_with_message_options()
+    {
+        $config = Configuration::newInstance()
+            ->setOptions(
+                [
+                    Configuration::OPT_TRANSACTIONAL    => false,
+                    Configuration::OPT_OPEN_TRACKING    => false,
+                    Configuration::OPT_CLICK_TRACKING   => false,
+                    Configuration::OPT_SANDBOX          => true,
+                    Configuration::OPT_SKIP_SUPPRESSION => true,
+                    Configuration::OPT_INLINE_CSS       => true,
+                    Configuration::OPT_IP_POOL          => 'some-ip-pool',
+                ]
+            );
+
+        $payloadBuilder = new StandardPayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $message = Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com'])
+            ->setOptions(
+                [
+                    Configuration::OPT_TRANSACTIONAL    => true,
+                    Configuration::OPT_OPEN_TRACKING    => true,
+                    Configuration::OPT_CLICK_TRACKING   => true,
+                    Configuration::OPT_SANDBOX          => false,
+                    Configuration::OPT_SKIP_SUPPRESSION => false,
+                    Configuration::OPT_INLINE_CSS       => false,
+                    Configuration::OPT_IP_POOL          => 'other-ip-pool',
+                ]
+            );
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional'    => true,
+                'open_tracking'    => true,
+                'click_tracking'   => true,
+                'sandbox'          => false,
+                'skip_suppression' => false,
+                'inline_css'       => false,
+                'ip_pool'          => 'other-ip-pool',
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_use_the_ip_pool_if_probability_is_0()
+    {
+        $config = Configuration::newInstance()
+            ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+            ->setIpPoolProbability(0);
+
+        $payloadBuilder = new StandardPayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com']);
+
+        $this->randomNumberGenerator->generate()
+            ->shouldNotBeCalled();
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional' => true,
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_use_the_ip_pool_if_random_number_is_higher_than_probability()
+    {
+        $config = Configuration::newInstance()
+            ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+            ->setIpPoolProbability(0.5);
+
+        $payloadBuilder = new StandardPayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com']);
+
+        $this->randomNumberGenerator->generate()
+            ->willReturn(0.6);
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional' => true,
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_use_the_ip_pool_if_random_number_is_lower_than_probability()
+    {
+        $config = Configuration::newInstance()
+            ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+            ->setIpPoolProbability(0.5);
+
+        $payloadBuilder = new StandardPayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com']);
+
+        $this->randomNumberGenerator->generate()
+            ->willReturn(0.4);
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional' => true,
+                'ip_pool'       => 'some-ip-pool',
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
     }
 }
