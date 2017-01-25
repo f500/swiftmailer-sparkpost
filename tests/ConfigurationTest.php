@@ -40,7 +40,7 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_says_to_override_when_an_override_is_given()
+    public function it_states_that_recipients_should_be_overridden_when_an_override_is_provided()
     {
         $config = Configuration::newInstance()
             ->setRecipientOverride('override@domain.com');
@@ -63,7 +63,7 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_says_to_override_Gmail_style_when_configured_so()
+    public function it_states_that_Gmail_style_overriding_should_be_done_when_configured_so()
     {
         $config = Configuration::newInstance()
             ->setOverrideGmailStyle(true);

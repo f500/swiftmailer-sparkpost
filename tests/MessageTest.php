@@ -33,7 +33,7 @@ final class MessageTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_represents_a_swift_message()
+    public function it_is_an_extension_of_a_Swift_Message()
     {
         $message = new Message();
 
@@ -236,7 +236,7 @@ final class MessageTest extends PHPUnit_Framework_TestCase
      * @expectedException \SwiftSparkPost\Exception
      * @expectedExceptionMessage Unknown SparkPost option "unknown_option"
      */
-    public function it_does_not_accept_unknown_options()
+    public function it_does_not_accept_an_unknown_option()
     {
         $message = new Message();
         $message->setOptions(['unknown_option' => 'ullamcorper']);
