@@ -41,16 +41,20 @@ final class Transport implements Swift_Transport
     private $payloadBuilder;
 
     /**
-     * @param string $apiKey
-     * @param string $recipientOverride
+     * @param string             $apiKey
+     * @param Configuration|null $config
      *
      * @return Transport
      */
-    public static function newInstance($apiKey, $recipientOverride = '')
+    public static function newInstance($apiKey, Configuration $config = null)
     {
+        if ($config === null) {
+            $config = new Configuration();
+        }
+
         $eventDispatcher = Swift_DependencyContainer::getInstance()->lookup('transport.eventdispatcher');
         $sparkpost       = new SparkPost(new GuzzleAdapter(new GuzzleClient()), ['key' => $apiKey]);
-        $payloadBuilder  = new PayloadBuilder($recipientOverride);
+        $payloadBuilder  = new PayloadBuilder($config);
 
         return new self($eventDispatcher, $sparkpost, $payloadBuilder);
     }

@@ -42,14 +42,27 @@ $message = SwiftSparkPost\Message::newInstance()
 $sent = $mailer->send($message);
 ```
 
-You can optionally provide a recipient override.
+#### Override recipients
+
+You can override recipients by passing a configuration object.
+The email address will be overridden, other properties (like name, tags, etc) won't be touched.
 
 ```php
-$transport = SwiftSparkPost\Transport::newInstance('API-KEY', 'override@domain.com');
+$config = SwiftSparkPost\Configuration::newInstance()
+    ->setRecipientOverride('override@domain.com');
+
+$transport = SwiftSparkPost\Transport::newInstance('API-KEY', $config);
 ```
 
-All `To`, `Cc` and `Bcc` email addresses will be overriden,
-in a way that `john@doe.com` becomes `override+john-doe-com@domain.com`.
+You can use Gmail style overrides, so that `john@doe.com` will become `override+john-doe-com@domain.com`.
+
+```php
+$config = SwiftSparkPost\Configuration::newInstance()
+    ->setRecipientOverride('override@domain.com')
+    ->setOverrideGmailStyle(true);
+
+$transport = SwiftSparkPost\Transport::newInstance('API-KEY', $config);
+```
 
 License
 -------

@@ -18,32 +18,16 @@ use Swift_MimePart;
 final class PayloadBuilder implements PayloadBuilderInterface
 {
     /**
-     * @var string
+     * @var Configuration
      */
-    private $overridePart1;
+    private $config;
 
     /**
-     * @var string
+     * @param Configuration $config
      */
-    private $overridePart2;
-
-    /**
-     * @param string $recipientOverride
-     *
-     * @throws Exception
-     */
-    public function __construct($recipientOverride = '')
+    public function __construct(Configuration $config)
     {
-        $this->overridePart1 = '';
-        $this->overridePart2 = '';
-
-        if ($recipientOverride) {
-            if (!filter_var($recipientOverride, FILTER_VALIDATE_EMAIL)) {
-                throw new Exception('Recipient override must be a valid email address');
-            }
-
-            list($this->overridePart1, $this->overridePart2) = explode('@', $recipientOverride);
-        }
+        $this->config = $config;
     }
 
     /**
@@ -370,15 +354,17 @@ final class PayloadBuilder implements PayloadBuilderInterface
      */
     private function overrideRecipient($email)
     {
-        if (!$this->overridePart1 || !$this->overridePart2) {
+        if (!$this->config->overrideRecipients()) {
             return $email;
         }
 
-        return sprintf(
-            '%s+%s@%s',
-            $this->overridePart1,
-            trim(preg_replace('/([^a-z0-9]+)/i', '-', $email), '-'),
-            $this->overridePart2
-        );
+        if (!$this->config->overrideGmailStyle()) {
+            return $this->config->getRecipientOverride();
+        }
+
+        list ($userPart, $domainPart) = explode('@', $this->config->getRecipientOverride());
+        $reformattedEmail = trim(preg_replace('/([^a-z0-9]+)/i', '-', $email), '-');
+
+        return sprintf('%s+%s@%s', $userPart, $reformattedEmail, $domainPart);
     }
 }
