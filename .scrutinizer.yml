@@ -3,7 +3,6 @@ checks:
         code_rating: true
         duplication: true
 
-        align_assignments: true
         avoid_fixme_comments: true
         avoid_multiple_statements_on_same_line: true
         avoid_perl_style_comments: true
@@ -19,7 +18,6 @@ checks:
         function_in_camel_caps: true
         newline_at_end_of_file: true
         optional_parameters_at_the_end: true
-        overriding_parameter: true
         parameter_doc_comments: true
         parameters_in_camelcaps: true
         prefer_while_loop_over_for_loop: true
