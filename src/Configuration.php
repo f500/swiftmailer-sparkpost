@@ -36,6 +36,11 @@ final class Configuration
     private $options;
 
     /**
+     * @var float
+     */
+    private $ipPoolProbability;
+
+    /**
      * @param array $options
      *
      * @throws Exception
@@ -72,6 +77,7 @@ final class Configuration
         $this->recipientOverride  = '';
         $this->overrideGmailStyle = false;
         $this->options            = [self::OPT_TRANSACTIONAL => true];
+        $this->ipPoolProbability  = 1.0;
     }
 
     public function overrideRecipients()
@@ -150,6 +156,31 @@ final class Configuration
 
             $this->options[$option] = (bool) $value;
         }
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getIpPoolProbability()
+    {
+        return $this->ipPoolProbability;
+    }
+
+    /**
+     * @param float $ipPoolProbability
+     *
+     * @return Configuration
+     * @throws Exception
+     */
+    public function setIpPoolProbability($ipPoolProbability)
+    {
+        if ($ipPoolProbability < 0 || $ipPoolProbability > 1) {
+            throw new Exception('IP pool probability must be between 0 and 1');
+        }
+
+        $this->ipPoolProbability = (float) $ipPoolProbability;
 
         return $this;
     }

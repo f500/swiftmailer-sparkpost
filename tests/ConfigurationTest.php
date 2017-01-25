@@ -25,6 +25,7 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
         $this->assertSame(false, $config->overrideRecipients());
         $this->assertSame(false, $config->overrideGmailStyle());
         $this->assertSame('', $config->getRecipientOverride());
+        $this->assertSame(1.0, $config->getIpPoolProbability());
     }
 
     /**
@@ -114,5 +115,38 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
     {
         Configuration::newInstance()
             ->setOptions(['unknown_option' => 'ullamcorper']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_exposes_the_ip_pool_probability_when_provided()
+    {
+        $config = Configuration::newInstance()
+            ->setIpPoolProbability(0.5);
+
+        $this->assertSame(0.5, $config->getIpPoolProbability());
+    }
+
+    /**
+     * @test
+     * @expectedException \SwiftSparkPost\Exception
+     * @expectedExceptionMessage IP pool probability must be between 0 and 1
+     */
+    public function it_does_not_accept_an_ip_pool_probability_lower_than_0()
+    {
+        Configuration::newInstance()
+            ->setIpPoolProbability(-0.1);
+    }
+
+    /**
+     * @test
+     * @expectedException \SwiftSparkPost\Exception
+     * @expectedExceptionMessage IP pool probability must be between 0 and 1
+     */
+    public function it_does_not_accept_an_ip_pool_probability_higher_than_1()
+    {
+        Configuration::newInstance()
+            ->setIpPoolProbability(1.1);
     }
 }

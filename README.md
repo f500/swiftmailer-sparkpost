@@ -103,6 +103,19 @@ $message = SwiftSparkPost\Message::newInstance()
     ->setOptions(['...']);
 ```
 
+### IP pool probability
+
+Add a probability factor to enable the IP pool only for a percentage of messages sent.
+0 will never use the IP pool, 1 will always use it.
+
+Can be used to facilitate an IP warming process.
+
+```php
+$config = SwiftSparkPost\Configuration::newInstance()
+    ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+    ->setIpPoolProbability(0.5);
+```
+
 License
 -------
 

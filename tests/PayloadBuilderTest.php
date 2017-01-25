@@ -7,12 +7,13 @@
 namespace SwiftSparkPost\Tests;
 
 use PHPUnit_Framework_TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Swift_Attachment;
 use Swift_Message;
 use SwiftSparkPost\Configuration;
 use SwiftSparkPost\Message;
 use SwiftSparkPost\PayloadBuilder;
-use SwiftSparkPost\PayloadBuilderInterface;
+use SwiftSparkPost\RandomNumberGenerator;
 
 /**
  * @copyright Future500 B.V.
@@ -21,14 +22,22 @@ use SwiftSparkPost\PayloadBuilderInterface;
 final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var PayloadBuilderInterface
+     * @var PayloadBuilder
      */
     private $payloadBuilder;
 
+    /**
+     * @var RandomNumberGenerator|ObjectProphecy
+     */
+    private $randomNumberGenerator;
+
     protected function setUp()
     {
+        $this->randomNumberGenerator = $this->prophesize(RandomNumberGenerator::class);
+
         $this->payloadBuilder = new PayloadBuilder(
-            new Configuration()
+            new Configuration(),
+            $this->randomNumberGenerator->reveal()
         );
     }
 
@@ -379,7 +388,10 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         $config = Configuration::newInstance()
             ->setRecipientOverride('override@domain.com');
 
-        $payloadBuilder = new PayloadBuilder($config);
+        $payloadBuilder = new PayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
 
         $message = Swift_Message::newInstance()
             ->setFrom('me@domain.com', 'Me')
@@ -434,7 +446,10 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         $config = Configuration::newInstance()
             ->setRecipientOverride('override@domain.com');
 
-        $payloadBuilder = new PayloadBuilder($config);
+        $payloadBuilder = new PayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
 
         $message = Message::newInstance();
         $message->setFrom('me@domain.com', 'Me');
@@ -490,7 +505,10 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ->setRecipientOverride('override@domain.com')
             ->setOverrideGmailStyle(true);
 
-        $payloadBuilder = new PayloadBuilder($config);
+        $payloadBuilder = new PayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
 
         $message = Swift_Message::newInstance()
             ->setFrom('me@domain.com', 'Me')
@@ -546,7 +564,10 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ->setRecipientOverride('override@domain.com')
             ->setOverrideGmailStyle(true);
 
-        $payloadBuilder = new PayloadBuilder($config);
+        $payloadBuilder = new PayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
 
         $message = Message::newInstance();
         $message->setFrom('me@domain.com', 'Me');
@@ -611,7 +632,10 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 ]
             );
 
-        $payloadBuilder = new PayloadBuilder($config);
+        $payloadBuilder = new PayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
 
         $message = Swift_Message::newInstance()
             ->setFrom('me@domain.com')
@@ -647,8 +671,12 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     public function it_is_not_affected_by_changes_to_configuration_after_being_supplied()
     {
-        $config         = Configuration::newInstance();
-        $payloadBuilder = new PayloadBuilder($config);
+        $config = Configuration::newInstance();
+
+        $payloadBuilder = new PayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
 
         $config
             ->setRecipientOverride('override@domain.com')
@@ -695,7 +723,10 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 ]
             );
 
-        $payloadBuilder = new PayloadBuilder($config);
+        $payloadBuilder = new PayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
 
         $message = Message::newInstance()
             ->setFrom('me@domain.com')
@@ -729,6 +760,127 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'skip_suppression' => false,
                 'inline_css'       => false,
                 'ip_pool'          => 'other-ip-pool',
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_use_the_ip_pool_if_probability_is_0()
+    {
+        $config = Configuration::newInstance()
+            ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+            ->setIpPoolProbability(0);
+
+        $payloadBuilder = new PayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com']);
+
+        $this->randomNumberGenerator->generate()
+            ->shouldNotBeCalled();
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional' => true,
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_use_the_ip_pool_if_random_number_is_higher_than_probability()
+    {
+        $config = Configuration::newInstance()
+            ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+            ->setIpPoolProbability(0.5);
+
+        $payloadBuilder = new PayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com']);
+
+        $this->randomNumberGenerator->generate()
+            ->willReturn(0.6);
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional' => true,
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_use_the_ip_pool_if_random_number_is_lower_than_probability()
+    {
+        $config = Configuration::newInstance()
+            ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+            ->setIpPoolProbability(0.5);
+
+        $payloadBuilder = new PayloadBuilder(
+            $config,
+            $this->randomNumberGenerator->reveal()
+        );
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com']);
+
+        $this->randomNumberGenerator->generate()
+            ->willReturn(0.4);
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional' => true,
+                'ip_pool'       => 'some-ip-pool',
             ],
         ];
 

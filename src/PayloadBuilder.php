@@ -23,11 +23,18 @@ final class PayloadBuilder implements PayloadBuilderInterface
     private $config;
 
     /**
-     * @param Configuration $config
+     * @var RandomNumberGenerator
      */
-    public function __construct(Configuration $config)
+    private $randomNumberGenerator;
+
+    /**
+     * @param Configuration         $config
+     * @param RandomNumberGenerator $randomNumberGenerator
+     */
+    public function __construct(Configuration $config, RandomNumberGenerator $randomNumberGenerator)
     {
-        $this->config = clone $config;
+        $this->config                = clone $config;
+        $this->randomNumberGenerator = $randomNumberGenerator;
     }
 
     /**
@@ -317,6 +324,10 @@ final class PayloadBuilder implements PayloadBuilderInterface
     {
         $options = $this->config->getOptions();
 
+        if (!$this->configuredIpPoolShouldBeUsed()) {
+            unset($options[Configuration::OPT_IP_POOL]);
+        }
+
         if ($message instanceof Message) {
             $options = array_merge($options, $message->getOptions());
         }
@@ -368,5 +379,21 @@ final class PayloadBuilder implements PayloadBuilderInterface
         $reformattedEmail = trim(preg_replace('/([^a-z0-9]+)/i', '-', $email), '-');
 
         return sprintf('%s+%s@%s', $userPart, $reformattedEmail, $domainPart);
+    }
+
+    /**
+     * @return bool
+     */
+    private function configuredIpPoolShouldBeUsed()
+    {
+        if ($this->config->getIpPoolProbability() === 0.0) {
+            return false;
+        }
+
+        if ($this->config->getIpPoolProbability() === 1.0) {
+            return true;
+        }
+
+        return ($this->randomNumberGenerator->generate() <= $this->config->getIpPoolProbability());
     }
 }
