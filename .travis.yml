@@ -16,7 +16,7 @@ script:
   - vendor/bin/phpcs --report=full --standard=PSR2 --encoding=utf-8 src
 
 after_script:
-  - tests/upload-coverage.sh
+  - build/upload-coverage.sh
 
 cache:
   directories:
