@@ -30,6 +30,19 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_states_that_messages_are_transactional_by_default()
+    {
+        $config = new Configuration();
+
+        $this->assertSame(
+            [Configuration::OPT_TRANSACTIONAL => true],
+            $config->getOptions()
+        );
+    }
+
+    /**
+     * @test
+     */
     public function it_can_be_created_statically()
     {
         $config = Configuration::newInstance();
@@ -69,5 +82,37 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
             ->setOverrideGmailStyle(true);
 
         $this->assertSame(true, $config->overrideGmailStyle());
+    }
+
+    /**
+     * @test
+     */
+    public function it_exposes_options_when_provided()
+    {
+        $options = [
+            Configuration::OPT_TRANSACTIONAL    => false,
+            Configuration::OPT_OPEN_TRACKING    => false,
+            Configuration::OPT_CLICK_TRACKING   => false,
+            Configuration::OPT_SANDBOX          => true,
+            Configuration::OPT_SKIP_SUPPRESSION => true,
+            Configuration::OPT_INLINE_CSS       => true,
+            Configuration::OPT_IP_POOL          => 'some-ip-pool',
+        ];
+
+        $config = Configuration::newInstance()
+            ->setOptions($options);
+
+        $this->assertSame($options, $config->getOptions());
+    }
+
+    /**
+     * @test
+     * @expectedException \SwiftSparkPost\Exception
+     * @expectedExceptionMessage Unknown SparkPost option "unknown_option"
+     */
+    public function it_does_not_accept_an_unknown_option()
+    {
+        Configuration::newInstance()
+            ->setOptions(['unknown_option' => 'ullamcorper']);
     }
 }

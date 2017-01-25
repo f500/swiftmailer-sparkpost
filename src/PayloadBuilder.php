@@ -315,11 +315,13 @@ final class PayloadBuilder implements PayloadBuilderInterface
      */
     private function buildOptions(Swift_Mime_Message $message)
     {
-        if (!($message instanceof Message)) {
-            return [];
+        $options = $this->config->getOptions();
+
+        if ($message instanceof Message) {
+            $options = array_merge($options, $message->getOptions());
         }
 
-        return $message->getOptions();
+        return $options;
     }
 
     /**

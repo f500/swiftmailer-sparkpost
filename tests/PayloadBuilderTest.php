@@ -57,6 +57,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'from'    => 'me@domain.com',
                 'text'    => 'This is a special message just for you.',
             ],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $this->payloadBuilder->buildPayload($message);
@@ -67,7 +70,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_builds_the_same_payload_with_default_options_for_an_extended_message()
+    public function it_builds_the_same_payload_for_an_extended_message()
     {
         $message = Message::newInstance()
             ->setFrom('me@domain.com')
@@ -86,7 +89,6 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ],
             'options'    => [
                 'transactional' => true,
-                'inline_css'    => true,
             ],
         ];
 
@@ -125,13 +127,13 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         $message->setPerRecipientSubstitutionData('jane@doe.com', ['mollis' => 'luctus']);
         $message->setOptions(
             [
-                'open_tracking'    => false,
-                'click_tracking'   => false,
-                'transactional'    => false,
-                'sandbox'          => true,
-                'skip_suppression' => true,
-                'inline_css'       => false,
-                'ip_pool'          => 'some-ip-pool',
+                Configuration::OPT_TRANSACTIONAL    => false,
+                Configuration::OPT_OPEN_TRACKING    => false,
+                Configuration::OPT_CLICK_TRACKING   => false,
+                Configuration::OPT_SANDBOX          => true,
+                Configuration::OPT_SKIP_SUPPRESSION => true,
+                Configuration::OPT_INLINE_CSS       => true,
+                Configuration::OPT_IP_POOL          => 'some-ip-pool',
             ]
         );
 
@@ -170,12 +172,12 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             'metadata'          => ['lorem' => 'ipsum', 'dolor' => 'sit', 'amet' => 'consectetur'],
             'substitution_data' => ['aenean' => 'pretium', 'sapien' => 'nec', 'eros' => 'ullamcorper'],
             'options'           => [
+                'transactional'    => false,
                 'open_tracking'    => false,
                 'click_tracking'   => false,
-                'transactional'    => false,
                 'sandbox'          => true,
                 'skip_suppression' => true,
-                'inline_css'       => false,
+                'inline_css'       => true,
                 'ip_pool'          => 'some-ip-pool',
             ],
         ];
@@ -209,6 +211,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
             ],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $this->payloadBuilder->buildPayload($message);
@@ -239,6 +244,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'from'     => ['email' => 'me@domain.com', 'name' => 'Me'],
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
+            ],
+            'options'    => [
+                'transactional' => true,
             ],
         ];
 
@@ -271,6 +279,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
             ],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $this->payloadBuilder->buildPayload($message);
@@ -301,6 +312,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'from'     => ['email' => 'me@domain.com', 'name' => 'Me'],
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
+            ],
+            'options'    => [
+                'transactional' => true,
             ],
         ];
 
@@ -333,6 +347,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'from'    => 'me@domain.com',
                 'html'    => '<html><body><p>This is a special message just for you, {{NAME}}.</p></body></html>',
                 'text'    => 'This is a special message just for you, {{NAME}}.',
+            ],
+            'options'    => [
+                'transactional' => true,
             ],
         ];
 
@@ -399,6 +416,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
             ],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $payloadBuilder->buildPayload($message);
@@ -451,7 +471,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
             ],
-            'options'    => ['transactional' => true, 'inline_css' => true],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $payloadBuilder->buildPayload($message);
@@ -504,6 +526,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'from'     => ['email' => 'me@domain.com', 'name' => 'Me'],
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
+            ],
+            'options'    => [
+                'transactional' => true,
             ],
         ];
 
@@ -558,7 +583,9 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'reply_to' => 'noreply@domain.com',
                 'text'     => '',
             ],
-            'options'    => ['transactional' => true, 'inline_css' => true],
+            'options'    => [
+                'transactional' => true,
+            ],
         ];
 
         $actualPayload = $payloadBuilder->buildPayload($message);
@@ -569,28 +596,139 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function changing_configuration_after_supplying_it_has_no_effect()
+    public function it_uses_configured_options()
     {
-        $config         = Configuration::newInstance();
-        $payloadBuilder = new PayloadBuilder($config);
+        $config = Configuration::newInstance()
+            ->setOptions(
+                [
+                    Configuration::OPT_TRANSACTIONAL    => false,
+                    Configuration::OPT_OPEN_TRACKING    => false,
+                    Configuration::OPT_CLICK_TRACKING   => false,
+                    Configuration::OPT_SANDBOX          => true,
+                    Configuration::OPT_SKIP_SUPPRESSION => true,
+                    Configuration::OPT_INLINE_CSS       => true,
+                    Configuration::OPT_IP_POOL          => 'some-ip-pool',
+                ]
+            );
 
-        $config
-            ->setRecipientOverride('override@domain.com');
+        $payloadBuilder = new PayloadBuilder($config);
 
         $message = Swift_Message::newInstance()
             ->setFrom('me@domain.com')
-            ->setTo(['john@doe.com'])
-            ->setSubject('Hello there!')
-            ->setBody('This is a special message just for you.', 'text/plain');
+            ->setTo(['john@doe.com']);
 
         $expectedPayload = [
             'recipients' => [
                 ['address' => ['email' => 'john@doe.com']],
             ],
             'content'    => [
-                'subject' => 'Hello there!',
+                'subject' => '',
                 'from'    => 'me@domain.com',
-                'text'    => 'This is a special message just for you.',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional'    => false,
+                'open_tracking'    => false,
+                'click_tracking'   => false,
+                'sandbox'          => true,
+                'skip_suppression' => true,
+                'inline_css'       => true,
+                'ip_pool'          => 'some-ip-pool',
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_is_not_affected_by_changes_to_configuration_after_being_supplied()
+    {
+        $config         = Configuration::newInstance();
+        $payloadBuilder = new PayloadBuilder($config);
+
+        $config
+            ->setRecipientOverride('override@domain.com')
+            ->setOptions([Configuration::OPT_TRANSACTIONAL => false]);
+
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com']);
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional' => true,
+            ],
+        ];
+
+        $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_overrides_configured_options_with_message_options()
+    {
+        $config = Configuration::newInstance()
+            ->setOptions(
+                [
+                    Configuration::OPT_TRANSACTIONAL    => false,
+                    Configuration::OPT_OPEN_TRACKING    => false,
+                    Configuration::OPT_CLICK_TRACKING   => false,
+                    Configuration::OPT_SANDBOX          => true,
+                    Configuration::OPT_SKIP_SUPPRESSION => true,
+                    Configuration::OPT_INLINE_CSS       => true,
+                    Configuration::OPT_IP_POOL          => 'some-ip-pool',
+                ]
+            );
+
+        $payloadBuilder = new PayloadBuilder($config);
+
+        $message = Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com'])
+            ->setOptions(
+                [
+                    Configuration::OPT_TRANSACTIONAL    => true,
+                    Configuration::OPT_OPEN_TRACKING    => true,
+                    Configuration::OPT_CLICK_TRACKING   => true,
+                    Configuration::OPT_SANDBOX          => false,
+                    Configuration::OPT_SKIP_SUPPRESSION => false,
+                    Configuration::OPT_INLINE_CSS       => false,
+                    Configuration::OPT_IP_POOL          => 'other-ip-pool',
+                ]
+            );
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => '',
+                'from'    => 'me@domain.com',
+                'text'    => '',
+            ],
+            'options'    => [
+                'transactional'    => true,
+                'open_tracking'    => true,
+                'click_tracking'   => true,
+                'sandbox'          => false,
+                'skip_suppression' => false,
+                'inline_css'       => false,
+                'ip_pool'          => 'other-ip-pool',
             ],
         ];
 

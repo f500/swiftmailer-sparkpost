@@ -70,11 +70,7 @@ final class Message extends Swift_Message
         $this->perRecipientMetadata         = [];
         $this->substitutionData             = [];
         $this->perRecipientSubstitutionData = [];
-
-        $this->options = [
-            'transactional' => true,
-            'inline_css'    => true,
-        ];
+        $this->options                      = [];
     }
 
     /**
@@ -215,7 +211,16 @@ final class Message extends Swift_Message
      */
     public function setOptions(array $options)
     {
-        $this->options = $this->sanitizeOptions($options);
+        Configuration::guardOptionValidity($options);
+
+        foreach ($options as $option => $value) {
+            if ($option === Configuration::OPT_IP_POOL) {
+                $this->options[$option] = (string) $value;
+                continue;
+            }
+
+            $this->options[$option] = (bool) $value;
+        }
 
         return $this;
     }
@@ -266,37 +271,6 @@ final class Message extends Swift_Message
 
         foreach ($substitutionData as $key => $value) {
             $sanitized[(string) $key] = (string) $value;
-        }
-
-        return $sanitized;
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return array
-     * @throws Exception
-     */
-    private function sanitizeOptions(array $options)
-    {
-        $sanitized = [];
-
-        foreach ($options as $key => $value) {
-            switch ($key) {
-                case 'open_tracking':
-                case 'click_tracking':
-                case 'transactional':
-                case 'sandbox':
-                case 'skip_suppression':
-                case 'inline_css':
-                    $sanitized[$key] = (bool) $value;
-                    break;
-                case 'ip_pool':
-                    $sanitized[$key] = (string) $value;
-                    break;
-                default:
-                    throw new Exception(sprintf('Unknown SparkPost option "%s"', $key));
-            }
         }
 
         return $sanitized;
