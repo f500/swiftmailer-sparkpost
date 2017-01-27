@@ -12,13 +12,7 @@ namespace SwiftSparkPost;
  */
 final class Configuration
 {
-    const OPT_TRANSACTIONAL    = 'transactional';
-    const OPT_OPEN_TRACKING    = 'open_tracking';
-    const OPT_CLICK_TRACKING   = 'click_tracking';
-    const OPT_SANDBOX          = 'sandbox';
-    const OPT_SKIP_SUPPRESSION = 'skip_suppression';
-    const OPT_INLINE_CSS       = 'inline_css';
-    const OPT_IP_POOL          = 'ip_pool';
+    use OptionsSanitizingCapabilities;
 
     /**
      * @var string
@@ -41,30 +35,6 @@ final class Configuration
     private $ipPoolProbability;
 
     /**
-     * @param array $options
-     *
-     * @throws Exception
-     */
-    public static function guardOptionValidity(array $options)
-    {
-        $validOptions = [
-            self::OPT_TRANSACTIONAL,
-            self::OPT_OPEN_TRACKING,
-            self::OPT_CLICK_TRACKING,
-            self::OPT_SANDBOX,
-            self::OPT_SKIP_SUPPRESSION,
-            self::OPT_INLINE_CSS,
-            self::OPT_IP_POOL,
-        ];
-
-        foreach (array_keys($options) as $option) {
-            if (!in_array($option, $validOptions, true)) {
-                throw new Exception(sprintf('Unknown SparkPost option "%s"', $option));
-            }
-        }
-    }
-
-    /**
      * @return Configuration
      */
     public static function newInstance()
@@ -76,7 +46,7 @@ final class Configuration
     {
         $this->recipientOverride  = '';
         $this->overrideGmailStyle = false;
-        $this->options            = [self::OPT_TRANSACTIONAL => true];
+        $this->options            = [Option::TRANSACTIONAL => true];
         $this->ipPoolProbability  = 1.0;
     }
 
@@ -142,20 +112,13 @@ final class Configuration
      * @param array $options
      *
      * @return Configuration
-     * @throws Exception
      */
     public function setOptions(array $options)
     {
-        self::guardOptionValidity($options);
-
-        foreach ($options as $option => $value) {
-            if ($option === self::OPT_IP_POOL) {
-                $this->options[$option] = (string) $value;
-                continue;
-            }
-
-            $this->options[$option] = (bool) $value;
-        }
+        $this->options = array_merge(
+            $this->options,
+            $this->sanitizeOptions($options)
+        );
 
         return $this;
     }

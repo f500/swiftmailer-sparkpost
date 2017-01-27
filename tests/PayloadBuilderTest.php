@@ -12,6 +12,7 @@ use Swift_Attachment;
 use Swift_Message;
 use SwiftSparkPost\Configuration;
 use SwiftSparkPost\Message;
+use SwiftSparkPost\Option;
 use SwiftSparkPost\RandomNumberGenerator;
 use SwiftSparkPost\StandardPayloadBuilder;
 
@@ -136,13 +137,13 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         $message->setPerRecipientSubstitutionData('jane@doe.com', ['mollis' => 'luctus']);
         $message->setOptions(
             [
-                Configuration::OPT_TRANSACTIONAL    => false,
-                Configuration::OPT_OPEN_TRACKING    => false,
-                Configuration::OPT_CLICK_TRACKING   => false,
-                Configuration::OPT_SANDBOX          => true,
-                Configuration::OPT_SKIP_SUPPRESSION => true,
-                Configuration::OPT_INLINE_CSS       => true,
-                Configuration::OPT_IP_POOL          => 'some-ip-pool',
+                Option::TRANSACTIONAL    => false,
+                Option::OPEN_TRACKING    => false,
+                Option::CLICK_TRACKING   => false,
+                Option::SANDBOX          => true,
+                Option::SKIP_SUPPRESSION => true,
+                Option::INLINE_CSS       => true,
+                Option::IP_POOL          => 'some-ip-pool',
             ]
         );
 
@@ -622,13 +623,13 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         $config = Configuration::newInstance()
             ->setOptions(
                 [
-                    Configuration::OPT_TRANSACTIONAL    => false,
-                    Configuration::OPT_OPEN_TRACKING    => false,
-                    Configuration::OPT_CLICK_TRACKING   => false,
-                    Configuration::OPT_SANDBOX          => true,
-                    Configuration::OPT_SKIP_SUPPRESSION => true,
-                    Configuration::OPT_INLINE_CSS       => true,
-                    Configuration::OPT_IP_POOL          => 'some-ip-pool',
+                    Option::TRANSACTIONAL    => false,
+                    Option::OPEN_TRACKING    => false,
+                    Option::CLICK_TRACKING   => false,
+                    Option::SANDBOX          => true,
+                    Option::SKIP_SUPPRESSION => true,
+                    Option::INLINE_CSS       => true,
+                    Option::IP_POOL          => 'some-ip-pool',
                 ]
             );
 
@@ -680,7 +681,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
 
         $config
             ->setRecipientOverride('override@domain.com')
-            ->setOptions([Configuration::OPT_TRANSACTIONAL => false]);
+            ->setOptions([Option::TRANSACTIONAL => false]);
 
         $message = Swift_Message::newInstance()
             ->setFrom('me@domain.com')
@@ -713,13 +714,13 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         $config = Configuration::newInstance()
             ->setOptions(
                 [
-                    Configuration::OPT_TRANSACTIONAL    => false,
-                    Configuration::OPT_OPEN_TRACKING    => false,
-                    Configuration::OPT_CLICK_TRACKING   => false,
-                    Configuration::OPT_SANDBOX          => true,
-                    Configuration::OPT_SKIP_SUPPRESSION => true,
-                    Configuration::OPT_INLINE_CSS       => true,
-                    Configuration::OPT_IP_POOL          => 'some-ip-pool',
+                    Option::TRANSACTIONAL    => false,
+                    Option::OPEN_TRACKING    => false,
+                    Option::CLICK_TRACKING   => false,
+                    Option::SANDBOX          => true,
+                    Option::SKIP_SUPPRESSION => true,
+                    Option::INLINE_CSS       => true,
+                    Option::IP_POOL          => 'some-ip-pool',
                 ]
             );
 
@@ -733,13 +734,13 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ->setTo(['john@doe.com'])
             ->setOptions(
                 [
-                    Configuration::OPT_TRANSACTIONAL    => true,
-                    Configuration::OPT_OPEN_TRACKING    => true,
-                    Configuration::OPT_CLICK_TRACKING   => true,
-                    Configuration::OPT_SANDBOX          => false,
-                    Configuration::OPT_SKIP_SUPPRESSION => false,
-                    Configuration::OPT_INLINE_CSS       => false,
-                    Configuration::OPT_IP_POOL          => 'other-ip-pool',
+                    Option::TRANSACTIONAL    => true,
+                    Option::OPEN_TRACKING    => true,
+                    Option::CLICK_TRACKING   => true,
+                    Option::SANDBOX          => false,
+                    Option::SKIP_SUPPRESSION => false,
+                    Option::INLINE_CSS       => false,
+                    Option::IP_POOL          => 'other-ip-pool',
                 ]
             );
 
@@ -774,7 +775,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_does_not_use_the_ip_pool_if_probability_is_0()
     {
         $config = Configuration::newInstance()
-            ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+            ->setOptions([Option::IP_POOL => 'some-ip-pool'])
             ->setIpPoolProbability(0);
 
         $payloadBuilder = new StandardPayloadBuilder(
@@ -814,7 +815,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_does_not_use_the_ip_pool_if_random_number_is_higher_than_probability()
     {
         $config = Configuration::newInstance()
-            ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+            ->setOptions([Option::IP_POOL => 'some-ip-pool'])
             ->setIpPoolProbability(0.5);
 
         $payloadBuilder = new StandardPayloadBuilder(
@@ -854,7 +855,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
     public function it_does_use_the_ip_pool_if_random_number_is_lower_than_probability()
     {
         $config = Configuration::newInstance()
-            ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+            ->setOptions([Option::IP_POOL => 'some-ip-pool'])
             ->setIpPoolProbability(0.5);
 
         $payloadBuilder = new StandardPayloadBuilder(
