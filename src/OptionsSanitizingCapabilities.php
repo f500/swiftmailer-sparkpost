@@ -36,7 +36,9 @@ trait OptionsSanitizingCapabilities
 
         foreach ($options as $option => $value) {
             if (in_array($option, $stringOptions, true)) {
-                $sanitized[$option] = (string) $value;
+                if ($value) {
+                    $sanitized[$option] = (string) $value;
+                }
                 continue;
             }
 

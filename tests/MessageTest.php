@@ -219,6 +219,17 @@ final class MessageTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
+     */
+    public function it_filters_out_an_empty_ip_pool()
+    {
+        $message = new Message();
+        $message->setOptions([Option::IP_POOL => null]);
+
+        $this->assertSame([], $message->getOptions());
+    }
+
+    /**
+     * @test
      * @expectedException \SwiftSparkPost\Exception
      * @expectedExceptionMessage Unknown SparkPost option "unknown_option"
      */

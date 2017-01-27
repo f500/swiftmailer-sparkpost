@@ -121,6 +121,17 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_filters_out_an_empty_ip_pool()
+    {
+        $config = Configuration::newInstance()
+            ->setOptions([Option::IP_POOL => null]);
+
+        $this->assertSame(['transactional' => true], $config->getOptions());
+    }
+
+    /**
+     * @test
+     */
     public function it_exposes_the_ip_pool_probability_when_provided()
     {
         $config = Configuration::newInstance()
