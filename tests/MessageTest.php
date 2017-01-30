@@ -10,8 +10,8 @@ use PHPUnit_Framework_TestCase;
 use stdClass;
 use Swift_Message;
 use Swift_Mime_Message;
-use SwiftSparkPost\Configuration;
 use SwiftSparkPost\Message;
+use SwiftSparkPost\Option;
 
 /**
  * @copyright Future500 B.V.
@@ -202,19 +202,30 @@ final class MessageTest extends PHPUnit_Framework_TestCase
     public function it_has_Options_when_provided()
     {
         $options = [
-            Configuration::OPT_TRANSACTIONAL    => false,
-            Configuration::OPT_OPEN_TRACKING    => false,
-            Configuration::OPT_CLICK_TRACKING   => false,
-            Configuration::OPT_SANDBOX          => true,
-            Configuration::OPT_SKIP_SUPPRESSION => true,
-            Configuration::OPT_INLINE_CSS       => true,
-            Configuration::OPT_IP_POOL          => 'some-ip-pool',
+            Option::TRANSACTIONAL    => false,
+            Option::OPEN_TRACKING    => false,
+            Option::CLICK_TRACKING   => false,
+            Option::SANDBOX          => true,
+            Option::SKIP_SUPPRESSION => true,
+            Option::INLINE_CSS       => true,
+            Option::IP_POOL          => 'some-ip-pool',
         ];
 
         $message = new Message();
         $message->setOptions($options);
 
         $this->assertSame($options, $message->getOptions());
+    }
+
+    /**
+     * @test
+     */
+    public function it_filters_out_an_empty_ip_pool()
+    {
+        $message = new Message();
+        $message->setOptions([Option::IP_POOL => null]);
+
+        $this->assertSame([], $message->getOptions());
     }
 
     /**

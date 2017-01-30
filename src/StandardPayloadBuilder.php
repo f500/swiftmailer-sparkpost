@@ -325,7 +325,7 @@ final class StandardPayloadBuilder implements PayloadBuilder
         $options = $this->config->getOptions();
 
         if (!$this->configuredIpPoolShouldBeUsed()) {
-            unset($options[Configuration::OPT_IP_POOL]);
+            unset($options[Option::IP_POOL]);
         }
 
         if ($message instanceof Message) {

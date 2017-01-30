@@ -14,6 +14,8 @@ use Swift_Message;
  */
 final class Message extends Swift_Message
 {
+    use OptionsSanitizingCapabilities;
+
     /**
      * @var string
      */
@@ -211,16 +213,10 @@ final class Message extends Swift_Message
      */
     public function setOptions(array $options)
     {
-        Configuration::guardOptionValidity($options);
-
-        foreach ($options as $option => $value) {
-            if ($option === Configuration::OPT_IP_POOL) {
-                $this->options[$option] = (string) $value;
-                continue;
-            }
-
-            $this->options[$option] = (bool) $value;
-        }
+        $this->options = array_merge(
+            $this->options,
+            $this->sanitizeOptions($options)
+        );
 
         return $this;
     }

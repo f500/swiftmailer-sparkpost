@@ -86,13 +86,13 @@ $config = SwiftSparkPost\Configuration::newInstance()
 ```php
 $config = SwiftSparkPost\Configuration::newInstance()
     ->setOptions([
-        Configuration::OPT_TRANSACTIONAL    => false,
-        Configuration::OPT_OPEN_TRACKING    => false,
-        Configuration::OPT_CLICK_TRACKING   => false,
-        Configuration::OPT_SANDBOX          => true,
-        Configuration::OPT_SKIP_SUPPRESSION => true,
-        Configuration::OPT_INLINE_CSS       => true,
-        Configuration::OPT_IP_POOL          => 'some-ip-pool',
+        SwiftSparkPost\Option::TRANSACTIONAL    => false,
+        SwiftSparkPost\Option::OPEN_TRACKING    => false,
+        SwiftSparkPost\Option::CLICK_TRACKING   => false,
+        SwiftSparkPost\Option::SANDBOX          => true,
+        SwiftSparkPost\Option::SKIP_SUPPRESSION => true,
+        SwiftSparkPost\Option::INLINE_CSS       => true,
+        SwiftSparkPost\Option::IP_POOL          => 'some-ip-pool',
     ]);
 ```
 
@@ -112,7 +112,7 @@ Can be used to facilitate an IP warming process.
 
 ```php
 $config = SwiftSparkPost\Configuration::newInstance()
-    ->setOptions([Configuration::OPT_IP_POOL => 'some-ip-pool'])
+    ->setOptions([SwiftSparkPost\Option::IP_POOL => 'some-ip-pool'])
     ->setIpPoolProbability(0.5);
 ```
 
