@@ -7,6 +7,7 @@
 namespace SwiftSparkPost;
 
 use Swift_Mime_Message;
+use Swift_OutputByteStream;
 
 /**
  * @copyright Future500 B.V.
@@ -100,4 +101,13 @@ interface ExtendedMessage extends Swift_Mime_Message
      * @return Message
      */
     public function setOptions(array $options);
+
+    /**
+     * @param string|Swift_OutputByteStream $body
+     * @param string|null                   $contentType
+     * @param string|null                   $charset
+     *
+     * @return Message
+     */
+    public function addPart($body, $contentType = null, $charset = null);
 }
