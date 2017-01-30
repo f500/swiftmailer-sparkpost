@@ -12,7 +12,7 @@ use Swift_Message;
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class Message extends Swift_Message
+final class Message extends Swift_Message implements ExtendedMessage
 {
     use OptionsSanitizingCapabilities;
 
@@ -76,7 +76,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getCampaignId()
     {
@@ -84,9 +84,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @param string $campaignId
-     *
-     * @return Message
+     * {@inheritdoc}
      */
     public function setCampaignId($campaignId)
     {
@@ -96,7 +94,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getPerRecipientTags()
     {
@@ -104,10 +102,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @param string $recipient
-     * @param array  $tags
-     *
-     * @return Message
+     * {@inheritdoc}
      */
     public function setPerRecipientTags($recipient, array $tags)
     {
@@ -117,7 +112,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getMetadata()
     {
@@ -125,9 +120,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @param array $metadata
-     *
-     * @return Message
+     * {@inheritdoc}
      */
     public function setMetadata(array $metadata)
     {
@@ -137,7 +130,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getPerRecipientMetadata()
     {
@@ -145,10 +138,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @param string $recipient
-     * @param array  $metadata
-     *
-     * @return Message
+     * {@inheritdoc}
      */
     public function setPerRecipientMetadata($recipient, array $metadata)
     {
@@ -158,7 +148,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSubstitutionData()
     {
@@ -166,9 +156,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @param array $substitutionData
-     *
-     * @return Message
+     * {@inheritdoc}
      */
     public function setSubstitutionData(array $substitutionData)
     {
@@ -178,7 +166,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getPerRecipientSubstitutionData()
     {
@@ -186,10 +174,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @param string $recipient
-     * @param array  $substitutionData
-     *
-     * @return Message
+     * {@inheritdoc}
      */
     public function setPerRecipientSubstitutionData($recipient, array $substitutionData)
     {
@@ -199,7 +184,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getOptions()
     {
@@ -207,9 +192,7 @@ final class Message extends Swift_Message
     }
 
     /**
-     * @param array $options
-     *
-     * @return Message
+     * {@inheritdoc}
      */
     public function setOptions(array $options)
     {
