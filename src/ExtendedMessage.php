@@ -23,7 +23,7 @@ interface ExtendedMessage extends Swift_Mime_Message
     /**
      * @param string $campaignId
      *
-     * @return Message
+     * @return static
      */
     public function setCampaignId($campaignId);
 
@@ -36,7 +36,7 @@ interface ExtendedMessage extends Swift_Mime_Message
      * @param string $recipient
      * @param array  $tags
      *
-     * @return Message
+     * @return static
      */
     public function setPerRecipientTags($recipient, array $tags);
 
@@ -48,7 +48,7 @@ interface ExtendedMessage extends Swift_Mime_Message
     /**
      * @param array $metadata
      *
-     * @return Message
+     * @return static
      */
     public function setMetadata(array $metadata);
 
@@ -61,7 +61,7 @@ interface ExtendedMessage extends Swift_Mime_Message
      * @param string $recipient
      * @param array  $metadata
      *
-     * @return Message
+     * @return static
      */
     public function setPerRecipientMetadata($recipient, array $metadata);
 
@@ -73,7 +73,7 @@ interface ExtendedMessage extends Swift_Mime_Message
     /**
      * @param array $substitutionData
      *
-     * @return Message
+     * @return static
      */
     public function setSubstitutionData(array $substitutionData);
 
@@ -86,7 +86,7 @@ interface ExtendedMessage extends Swift_Mime_Message
      * @param string $recipient
      * @param array  $substitutionData
      *
-     * @return Message
+     * @return static
      */
     public function setPerRecipientSubstitutionData($recipient, array $substitutionData);
 
@@ -98,7 +98,7 @@ interface ExtendedMessage extends Swift_Mime_Message
     /**
      * @param array $options
      *
-     * @return Message
+     * @return static
      */
     public function setOptions(array $options);
 
@@ -107,7 +107,7 @@ interface ExtendedMessage extends Swift_Mime_Message
      * @param string|null                   $contentType
      * @param string|null                   $charset
      *
-     * @return Message
+     * @return static
      */
     public function addPart($body, $contentType = null, $charset = null);
 }

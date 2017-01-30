@@ -302,6 +302,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     private function whenBeforeSendPerformedEventIsDispatched(Swift_Mime_Message $message)
     {
+        /** @var Swift_Events_SendEvent|ObjectProphecy $event */
         $event = $this->prophesize(Swift_Events_SendEvent::class);
 
         $event->bubbleCancelled()
@@ -431,7 +432,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
                 ]
             );
 
-        /** @var SparkPostResponse|ObjectProphecy $response */
+        /** @var SparkPostPromise|ObjectProphecy $response */
         $promise = $this->prophesize(SparkPostPromise::class);
 
         $promise->wait()
