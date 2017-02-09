@@ -91,6 +91,10 @@ final class Configuration
      */
     public function setRecipientOverride($recipientOverride)
     {
+        if (!$recipientOverride) {
+            return $this;
+        }
+
         if (!filter_var($recipientOverride, FILTER_VALIDATE_EMAIL)) {
             throw new Exception('Recipient override must be a valid email address');
         }
