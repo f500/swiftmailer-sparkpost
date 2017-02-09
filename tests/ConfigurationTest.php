@@ -78,6 +78,17 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_ignores_an_empty_recipient_override()
+    {
+        $config = Configuration::newInstance()
+            ->setRecipientOverride(null);
+
+        $this->assertSame('', $config->getRecipientOverride());
+    }
+
+    /**
+     * @test
+     */
     public function it_states_that_Gmail_style_overriding_should_be_done_when_configured_so()
     {
         $config = Configuration::newInstance()
