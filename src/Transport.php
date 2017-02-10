@@ -53,7 +53,7 @@ final class Transport implements Swift_Transport
         }
 
         $eventDispatcher       = Swift_DependencyContainer::getInstance()->lookup('transport.eventdispatcher');
-        $guzzle                = new GuzzleAdapter(new GuzzleClient(['timeout' => 300]));
+        $guzzle                = new GuzzleAdapter(new GuzzleClient(['http_errors' => false, 'timeout' => 300]));
         $sparkpost             = new SparkPost($guzzle, ['key' => $apiKey]);
         $randomNumberGenerator = new MtRandomNumberGenerator();
         $payloadBuilder        = new StandardPayloadBuilder($config, $randomNumberGenerator);
@@ -121,12 +121,14 @@ final class Transport implements Swift_Transport
             ? (int) $body['results']['total_accepted_recipients']
             : 0;
 
+        $unsent = isset($body['results']['total_rejected_recipients'])
+            ? (int) $body['results']['total_rejected_recipients']
+            : 0;
+
         if ($event) {
-            if ($response->getStatusCode() !== 200) {
+            if ($sent === 0) {
                 $event->setResult(Swift_Events_SendEvent::RESULT_FAILED);
-            } elseif ($response->getBody()['results']['total_accepted_recipients'] == 0) {
-                $event->setResult(Swift_Events_SendEvent::RESULT_FAILED);
-            } elseif ($response->getBody()['results']['total_rejected_recipients'] > 0) {
+            } elseif ($unsent > 0) {
                 $event->setResult(Swift_Events_SendEvent::RESULT_TENTATIVE);
             } else {
                 $event->setResult(Swift_Events_SendEvent::RESULT_SUCCESS);
@@ -178,16 +180,25 @@ final class Transport implements Swift_Transport
             $promise = $this->sparkpost->transmissions->post($payload);
 
             if ($promise instanceof SparkPostResponse) {
-                return $promise;
+                $response = $promise;
+            } else {
+                $response = $promise->wait();
             }
-
-            return $promise->wait();
         } catch (AnyException $exception) {
             throw $this->createAndDispatchTransportException(
                 'Failed to send transmission to SparkPost',
                 $exception
             );
         }
+
+        if (!isset($response->getBody()['results'])) {
+            throw $this->createAndDispatchTransportException(
+                'Failed to send transmission to SparkPost',
+                new Exception(json_encode($response->getBody()))
+            );
+        }
+
+        return $response;
     }
 
     /**

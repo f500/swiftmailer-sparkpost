@@ -186,7 +186,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      * @expectedException \Swift_TransportException
      * @expectedExceptionMessage Failed to build payload for a SparkPost transmission
      */
-    public function it_does_not_send_when_the_payload_fails_to_build()
+    public function it_throws_an_exception_when_the_payload_fails_to_build()
     {
         $message = Swift_Message::newInstance();
 
@@ -203,7 +203,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      * @expectedException \Swift_TransportException
      * @expectedExceptionMessage Failed to send transmission to SparkPost
      */
-    public function it_does_not_send_when_the_transmission_fails_to_send()
+    public function it_throws_an_exception_when_the_transmission_fails_to_send()
     {
         $message = Swift_Message::newInstance();
 
@@ -218,23 +218,41 @@ final class TransportTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @expectedException \Swift_TransportException
+     * @expectedExceptionMessage Failed to send transmission to SparkPost
      */
-    public function it_dispatches_a_failed_result_when_an_error_response_is_received()
+    public function it_throws_an_exception_when_the_response_has_no_results()
+    {
+        $message = Swift_Message::newInstance();
+
+        $this->whenBeforeSendPerformedEventIsDispatched($message);
+        $payload = $this->whenPayloadIsBuilt($message);
+        $this->whenSendingTransmissionHasNoResults($payload);
+
+        $this->thenExceptionThrownIsDispatched();
+
+        $this->transport->send($message);
+    }
+
+    /**
+     * @test
+     */
+    public function it_behaves_normally_when_the_response_has_a_non_200_status_code()
     {
         $message = Swift_Message::newInstance();
 
         $event   = $this->whenBeforeSendPerformedEventIsDispatched($message);
         $payload = $this->whenPayloadIsBuilt($message);
-        $this->whenTransmissionIsSentUnsuccessfully($payload);
+        $this->whenSendingTransmissionHasNon200StatusCode($payload);
 
-        $event->setResult(Swift_Events_SendEvent::RESULT_FAILED)
+        $event->setResult(Swift_Events_SendEvent::RESULT_SUCCESS)
             ->shouldBeCalled();
 
         $this->thenSendPerformedEventIsDispatched($event);
 
         $sent = $this->transport->send($message);
 
-        $this->assertSame(0, $sent);
+        $this->assertSame(2, $sent);
     }
 
     /**
@@ -381,7 +399,43 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      *
      * @return SparkPostResponse|ObjectProphecy
      */
-    private function whenTransmissionIsSentUnsuccessfully(array $payload)
+    private function whenAsynchronousTransmissionIsSentSuccessfully(array $payload)
+    {
+        /** @var SparkPostResponse|ObjectProphecy $response */
+        $response = $this->prophesize(SparkPostResponse::class);
+
+        $response->getStatusCode()
+            ->willReturn(200);
+
+        $response->getBody()
+            ->willReturn(
+                [
+                    'results' => [
+                        'total_rejected_recipients' => 0,
+                        'total_accepted_recipients' => 2,
+                        'id'                        => '11668787484950529',
+                    ],
+                ]
+            );
+
+        /** @var SparkPostPromise|ObjectProphecy $response */
+        $promise = $this->prophesize(SparkPostPromise::class);
+
+        $promise->wait()
+            ->willReturn($response->reveal());
+
+        $this->sparkpostTransmission->post($payload)
+            ->willReturn($promise->reveal());
+
+        return $response;
+    }
+
+    /**
+     * @param array $payload
+     *
+     * @return SparkPostResponse|ObjectProphecy
+     */
+    private function whenSendingTransmissionHasNoResults(array $payload)
     {
         /** @var SparkPostResponse|ObjectProphecy $response */
         $response = $this->prophesize(SparkPostResponse::class);
@@ -411,9 +465,9 @@ final class TransportTest extends PHPUnit_Framework_TestCase
     /**
      * @param array $payload
      *
-     * @return SparkPostResponse|ObjectProphecy
+     * @return ObjectProphecy|SparkPostResponse
      */
-    private function whenAsynchronousTransmissionIsSentSuccessfully(array $payload)
+    private function whenSendingTransmissionHasNon200StatusCode(array $payload)
     {
         /** @var SparkPostResponse|ObjectProphecy $response */
         $response = $this->prophesize(SparkPostResponse::class);
@@ -424,6 +478,13 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         $response->getBody()
             ->willReturn(
                 [
+                    'errors'  => [
+                        [
+                            'message'     => 'Message generation rejected',
+                            'description' => 'recipient address suppressed due to customer policy',
+                            'code'        => '1902',
+                        ],
+                    ],
                     'results' => [
                         'total_rejected_recipients' => 0,
                         'total_accepted_recipients' => 2,
@@ -432,14 +493,8 @@ final class TransportTest extends PHPUnit_Framework_TestCase
                 ]
             );
 
-        /** @var SparkPostPromise|ObjectProphecy $response */
-        $promise = $this->prophesize(SparkPostPromise::class);
-
-        $promise->wait()
-            ->willReturn($response->reveal());
-
         $this->sparkpostTransmission->post($payload)
-            ->willReturn($promise->reveal());
+            ->willReturn($response->reveal());
 
         return $response;
     }
