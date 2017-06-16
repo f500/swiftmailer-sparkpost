@@ -186,7 +186,7 @@ final class StandardPayloadBuilder implements PayloadBuilder
         }
 
         if ($headers = $this->buildHeaders($message)) {
-            $content['headers'] = $headers;
+            $content['headers'] = (object) $headers;
         }
 
         if ($attachments = $this->buildAttachments($message)) {
