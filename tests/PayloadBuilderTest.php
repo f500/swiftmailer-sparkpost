@@ -172,7 +172,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
                 'html'        => '<html><body><p>This is a special message just for you.</p></body></html>',
                 'text'        => 'This is a special message just for you.',
                 'headers'     => [
-                    'X-Custom: some-custom-header',
+                    'X-Custom' => 'some-custom-header',
                 ],
                 'attachments' => [
                     ['type' => 'text/plain', 'name' => 'textfile.txt', 'data' => 'U29tZSB0ZXh0IGluIGEgZmlsZS4='],
@@ -886,6 +886,44 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         ];
 
         $actualPayload = $payloadBuilder->buildPayload($message);
+
+        $this->assertSame($expectedPayload, $actualPayload);
+    }
+
+    /**
+     * @test
+     */
+    public function it_builds_headers_as_an_array_of_key_value_pairs()
+    {
+        $message = Swift_Message::newInstance()
+            ->setFrom('me@domain.com')
+            ->setTo(['john@doe.com'])
+            ->setSubject('Hello there!')
+            ->setBody('This is a special message just for you.', 'text/plain');
+
+        $message->getHeaders()->addTextHeader('X-Custom', 'some-custom-header');
+        $message->getHeaders()->addTextHeader('X-Custom-Other', 'some-other-custom-header');
+        $message->getHeaders()->addTextHeader('X-Custom-Other', 'overridden-custom-header');
+
+        $expectedPayload = [
+            'recipients' => [
+                ['address' => ['email' => 'john@doe.com']],
+            ],
+            'content'    => [
+                'subject' => 'Hello there!',
+                'from'    => 'me@domain.com',
+                'text'    => 'This is a special message just for you.',
+                'headers' => [
+                    'X-Custom'       => 'some-custom-header',
+                    'X-Custom-Other' => 'overridden-custom-header',
+                ],
+            ],
+            'options'    => [
+                'transactional' => true,
+            ],
+        ];
+
+        $actualPayload = $this->payloadBuilder->buildPayload($message);
 
         $this->assertSame($expectedPayload, $actualPayload);
     }

@@ -245,7 +245,7 @@ final class StandardPayloadBuilder implements PayloadBuilder
                 continue;
             }
 
-            $headers[] = trim($header->toString());
+            $headers[trim($header->getFieldName())] = trim($header->getFieldBody());
         }
 
         return $headers;
