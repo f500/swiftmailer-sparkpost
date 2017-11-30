@@ -15,7 +15,7 @@ use Swift_MimePart;
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class StandardPayloadBuilder implements PayloadBuilder
+class StandardPayloadBuilder implements PayloadBuilder
 {
     /**
      * @var Configuration

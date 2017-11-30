@@ -12,7 +12,7 @@ use Swift_Message;
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class Message extends Swift_Message implements ExtendedMessage
+class Message extends Swift_Message implements ExtendedMessage
 {
     use OptionsSanitizingCapabilities;
 

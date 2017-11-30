@@ -23,7 +23,7 @@ use Swift_TransportException;
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class Transport implements Swift_Transport
+class Transport implements Swift_Transport
 {
     /**
      * @var Swift_Events_EventDispatcher
