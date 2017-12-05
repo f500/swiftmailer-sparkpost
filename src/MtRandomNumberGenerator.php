@@ -10,7 +10,7 @@ namespace SwiftSparkPost;
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class MtRandomNumberGenerator implements RandomNumberGenerator
+class MtRandomNumberGenerator implements RandomNumberGenerator
 {
     /**
      * {@inheritdoc}
