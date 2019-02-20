@@ -6,14 +6,13 @@
 
 namespace SwiftSparkPost;
 
-use Swift_Mime_Message;
 use Swift_OutputByteStream;
 
 /**
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-interface ExtendedMessage extends Swift_Mime_Message
+interface ExtendedMessage
 {
     /**
      * @return string

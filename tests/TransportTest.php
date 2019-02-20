@@ -18,7 +18,7 @@ use Swift_Events_EventListener;
 use Swift_Events_SendEvent;
 use Swift_Events_TransportExceptionEvent;
 use Swift_Message;
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 use SwiftSparkPost\Exception;
 use SwiftSparkPost\Message;
 use SwiftSparkPost\PayloadBuilder;
@@ -123,7 +123,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     public function it_sends_a_plain_swift_message()
     {
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
 
         $event   = $this->whenBeforeSendPerformedEventIsDispatched($message);
         $payload = $this->whenPayloadIsBuilt($message);
@@ -165,7 +165,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     public function it_sends_a_message_asynchronously()
     {
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
 
         $event   = $this->whenBeforeSendPerformedEventIsDispatched($message);
         $payload = $this->whenPayloadIsBuilt($message);
@@ -188,7 +188,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     public function it_throws_an_exception_when_the_payload_fails_to_build()
     {
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
 
         $this->whenBeforeSendPerformedEventIsDispatched($message);
         $this->whenBuildingPayloadFails($message);
@@ -205,7 +205,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     public function it_throws_an_exception_when_the_transmission_fails_to_send()
     {
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
 
         $this->whenBeforeSendPerformedEventIsDispatched($message);
         $payload = $this->whenPayloadIsBuilt($message);
@@ -223,7 +223,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     public function it_throws_an_exception_when_the_response_has_no_results()
     {
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
 
         $this->whenBeforeSendPerformedEventIsDispatched($message);
         $payload = $this->whenPayloadIsBuilt($message);
@@ -239,7 +239,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     public function it_behaves_normally_when_the_response_has_a_non_200_status_code()
     {
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
 
         $event   = $this->whenBeforeSendPerformedEventIsDispatched($message);
         $payload = $this->whenPayloadIsBuilt($message);
@@ -260,7 +260,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     public function it_dispatches_a_failed_result_when_no_recipients_were_accepted()
     {
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
 
         $event   = $this->whenBeforeSendPerformedEventIsDispatched($message);
         $payload = $this->whenPayloadIsBuilt($message);
@@ -281,7 +281,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     public function it_dispatches_a_tentative_result_when_some_recipients_were_rejected()
     {
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
 
         $event   = $this->whenBeforeSendPerformedEventIsDispatched($message);
         $payload = $this->whenPayloadIsBuilt($message);
@@ -302,7 +302,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     public function it_sends_nothing_when_BeforeSendPerformedEvent_cancels_bubbling()
     {
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
 
         $event = $this->whenBeforeSendPerformedEventIsDispatched($message);
         $event->bubbleCancelled()
@@ -314,11 +314,11 @@ final class TransportTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return Swift_Events_SendEvent|ObjectProphecy
      */
-    private function whenBeforeSendPerformedEventIsDispatched(Swift_Mime_Message $message)
+    private function whenBeforeSendPerformedEventIsDispatched(Swift_Mime_SimpleMessage $message)
     {
         /** @var Swift_Events_SendEvent|ObjectProphecy $event */
         $event = $this->prophesize(Swift_Events_SendEvent::class);
@@ -339,11 +339,11 @@ final class TransportTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      */
-    private function whenPayloadIsBuilt(Swift_Mime_Message $message)
+    private function whenPayloadIsBuilt(Swift_Mime_SimpleMessage $message)
     {
         $payload = [];
 
@@ -354,9 +354,9 @@ final class TransportTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      */
-    private function whenBuildingPayloadFails(Swift_Mime_Message $message)
+    private function whenBuildingPayloadFails(Swift_Mime_SimpleMessage $message)
     {
         $this->payloadBuilder->buildPayload($message)
             ->willThrow(Exception::class);

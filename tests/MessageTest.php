@@ -9,7 +9,7 @@ namespace SwiftSparkPost\Tests;
 use PHPUnit_Framework_TestCase;
 use stdClass;
 use Swift_Message;
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 use SwiftSparkPost\Message;
 use SwiftSparkPost\Option;
 
@@ -38,7 +38,7 @@ final class MessageTest extends PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $this->assertInstanceOf(Swift_Mime_Message::class, $message);
+        $this->assertInstanceOf(Swift_Mime_SimpleMessage::class, $message);
         $this->assertInstanceOf(Swift_Message::class, $message);
     }
 

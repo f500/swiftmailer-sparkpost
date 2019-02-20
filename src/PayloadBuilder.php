@@ -6,7 +6,7 @@
 
 namespace SwiftSparkPost;
 
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 
 /**
  * @copyright Future500 B.V.
@@ -15,9 +15,9 @@ use Swift_Mime_Message;
 interface PayloadBuilder
 {
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      */
-    public function buildPayload(Swift_Mime_Message $message);
+    public function buildPayload(Swift_Mime_SimpleMessage $message);
 }
