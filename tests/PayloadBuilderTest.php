@@ -6,10 +6,11 @@
 
 namespace SwiftSparkPost\Tests;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Swift_Attachment;
 use SwiftSparkPost\Configuration;
+use SwiftSparkPost\Exception;
 use SwiftSparkPost\Message;
 use SwiftSparkPost\Option;
 use SwiftSparkPost\RandomNumberGenerator;
@@ -19,7 +20,7 @@ use SwiftSparkPost\StandardPayloadBuilder;
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
+final class PayloadBuilderTest extends TestCase
 {
     /**
      * @var StandardPayloadBuilder
@@ -31,7 +32,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     private $randomNumberGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->randomNumberGenerator = $this->prophesize(RandomNumberGenerator::class);
 
@@ -41,7 +42,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->payloadBuilder = null;
     }
@@ -369,11 +370,12 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage Cannot send message without a recipient address
      */
     public function it_does_not_accept_a_message_without_real_recipients()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Cannot send message without a recipient address');
+
         $message = (new \Swift_Message())
             ->setFrom('me@domain.com');
 

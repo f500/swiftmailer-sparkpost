@@ -6,14 +6,14 @@
 
 namespace SwiftSparkPost\Tests;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use SwiftSparkPost\MtRandomNumberGenerator;
 
 /**
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class MtRandomNumberGeneratorTest extends PHPUnit_Framework_TestCase
+final class MtRandomNumberGeneratorTest extends TestCase
 {
     /**
      * @test
@@ -25,7 +25,7 @@ final class MtRandomNumberGeneratorTest extends PHPUnit_Framework_TestCase
         for ($i = 0; $i < 100; $i++) {
             $number = $randomNumberGenerator->generate();
 
-            $this->assertInternalType('float', $number);
+            $this->assertIsFloat($number);
             $this->assertGreaterThanOrEqual(0, $number);
             $this->assertLessThanOrEqual(1, $number);
         }

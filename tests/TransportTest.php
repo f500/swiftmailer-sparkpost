@@ -6,7 +6,7 @@
 
 namespace SwiftSparkPost\Tests;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument as Arg;
 use Prophecy\Prophecy\ObjectProphecy;
 use SparkPost\SparkPost;
@@ -28,7 +28,7 @@ use SwiftSparkPost\Transport;
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class TransportTest extends PHPUnit_Framework_TestCase
+final class TransportTest extends TestCase
 {
     /**
      * @var Swift_Events_EventDispatcher|ObjectProphecy
@@ -55,7 +55,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
      */
     private $transport;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher       = $this->prophesize(Swift_Events_EventDispatcher::class);
         $this->sparkpost             = $this->prophesize(SparkPost::class);
@@ -71,7 +71,7 @@ final class TransportTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->eventDispatcher       = null;
         $this->sparkpost             = null;
@@ -183,11 +183,12 @@ final class TransportTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \Swift_TransportException
-     * @expectedExceptionMessage Failed to build payload for a SparkPost transmission
      */
     public function it_throws_an_exception_when_the_payload_fails_to_build()
     {
+        $this->expectException(\Swift_TransportException::class);
+        $this->expectExceptionMessage('Failed to build payload for a SparkPost transmission');
+
         $message = new Swift_Message();
 
         $this->whenBeforeSendPerformedEventIsDispatched($message);
@@ -200,11 +201,12 @@ final class TransportTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \Swift_TransportException
-     * @expectedExceptionMessage Failed to send transmission to SparkPost
      */
     public function it_throws_an_exception_when_the_transmission_fails_to_send()
     {
+        $this->expectException(\Swift_TransportException::class);
+        $this->expectExceptionMessage('Failed to send transmission to SparkPost');
+
         $message = new Swift_Message();
 
         $this->whenBeforeSendPerformedEventIsDispatched($message);
@@ -218,11 +220,12 @@ final class TransportTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \Swift_TransportException
-     * @expectedExceptionMessage Failed to send transmission to SparkPost
      */
     public function it_throws_an_exception_when_the_response_has_no_results()
     {
+        $this->expectException(\Swift_TransportException::class);
+        $this->expectExceptionMessage('Failed to send transmission to SparkPost');
+
         $message = new Swift_Message();
 
         $this->whenBeforeSendPerformedEventIsDispatched($message);

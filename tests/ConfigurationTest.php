@@ -6,15 +6,16 @@
 
 namespace SwiftSparkPost\Tests;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use SwiftSparkPost\Configuration;
+use SwiftSparkPost\Exception;
 use SwiftSparkPost\Option;
 
 /**
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class ConfigurationTest extends PHPUnit_Framework_TestCase
+final class ConfigurationTest extends TestCase
 {
     /**
      * @test
@@ -66,11 +67,12 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage Recipient override must be a valid email address
      */
     public function it_does_not_accept_an_invalid_recipient_override()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Recipient override must be a valid email address');
+
         Configuration::newInstance()
             ->setRecipientOverride('invalid email');
     }
@@ -120,11 +122,12 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage Unknown SparkPost option "unknown_option"
      */
     public function it_does_not_accept_an_unknown_option()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unknown SparkPost option "unknown_option"');
+
         Configuration::newInstance()
             ->setOptions(['unknown_option' => 'ullamcorper']);
     }
@@ -153,22 +156,24 @@ final class ConfigurationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage IP pool probability must be between 0 and 1
      */
     public function it_does_not_accept_an_ip_pool_probability_lower_than_0()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('IP pool probability must be between 0 and 1');
+
         Configuration::newInstance()
             ->setIpPoolProbability(-0.1);
     }
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage IP pool probability must be between 0 and 1
      */
     public function it_does_not_accept_an_ip_pool_probability_higher_than_1()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('IP pool probability must be between 0 and 1');
+
         Configuration::newInstance()
             ->setIpPoolProbability(1.1);
     }

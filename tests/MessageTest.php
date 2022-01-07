@@ -6,10 +6,11 @@
 
 namespace SwiftSparkPost\Tests;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 use Swift_Message;
 use Swift_Mime_SimpleMessage;
+use SwiftSparkPost\Exception;
 use SwiftSparkPost\Message;
 use SwiftSparkPost\Option;
 
@@ -17,14 +18,14 @@ use SwiftSparkPost\Option;
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class MessageTest extends PHPUnit_Framework_TestCase
+final class MessageTest extends TestCase
 {
     /**
      * @var resource|null
      */
     private $file;
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->file) {
             fclose($this->file);
@@ -124,33 +125,36 @@ final class MessageTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage Metadata cannot contain objects or resources
      */
     public function it_prevents_objects_being_used_as_Metadata()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Metadata cannot contain objects or resources');
+
         $message = new Message();
         $message->setMetadata(['object' => new stdClass()]);
     }
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage Metadata cannot contain objects or resources
      */
     public function it_prevents_objects_being_used_as_PerRecipientMetadata()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Metadata cannot contain objects or resources');
+
         $message = new Message();
         $message->setPerRecipientMetadata('john@doe.com', ['object' => new stdClass()]);
     }
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage Metadata cannot contain objects or resources
      */
     public function it_prevents_resources_being_used_as_Metadata()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Metadata cannot contain objects or resources');
+
         $this->file = fopen('php://memory', 'r');
 
         $message = new Message();
@@ -159,11 +163,12 @@ final class MessageTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage Metadata cannot contain objects or resources
      */
     public function it_prevents_resources_being_used_as_PerRecipientMetadata()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Metadata cannot contain objects or resources');
+
         $this->file = fopen('php://memory', 'r');
 
         $message = new Message();
@@ -230,11 +235,12 @@ final class MessageTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage Unknown SparkPost option "unknown_option"
      */
     public function it_does_not_accept_an_unknown_option()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unknown SparkPost option "unknown_option"');
+
         $message = new Message();
         $message->setOptions(['unknown_option' => 'ullamcorper']);
     }
