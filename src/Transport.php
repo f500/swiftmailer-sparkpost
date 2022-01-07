@@ -8,7 +8,7 @@ namespace SwiftSparkPost;
 
 use Exception as AnyException;
 use GuzzleHttp\Client as GuzzleClient;
-use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
+use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use SparkPost\SparkPost;
 use SparkPost\SparkPostResponse;
 use Swift_DependencyContainer;
