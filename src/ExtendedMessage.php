@@ -17,19 +17,19 @@ interface ExtendedMessage
     /**
      * @return string
      */
-    public function getCampaignId();
+    public function getCampaignId(): string;
 
     /**
      * @param string $campaignId
      *
      * @return static
      */
-    public function setCampaignId($campaignId);
+    public function setCampaignId(string $campaignId): ExtendedMessage;
 
     /**
      * @return array
      */
-    public function getPerRecipientTags();
+    public function getPerRecipientTags(): array;
 
     /**
      * @param string $recipient
@@ -37,24 +37,24 @@ interface ExtendedMessage
      *
      * @return static
      */
-    public function setPerRecipientTags($recipient, array $tags);
+    public function setPerRecipientTags(string $recipient, array $tags): ExtendedMessage;
 
     /**
      * @return array
      */
-    public function getMetadata();
+    public function getMetadata(): array;
 
     /**
      * @param array $metadata
      *
      * @return static
      */
-    public function setMetadata(array $metadata);
+    public function setMetadata(array $metadata): ExtendedMessage;
 
     /**
      * @return array
      */
-    public function getPerRecipientMetadata();
+    public function getPerRecipientMetadata(): array;
 
     /**
      * @param string $recipient
@@ -62,24 +62,24 @@ interface ExtendedMessage
      *
      * @return static
      */
-    public function setPerRecipientMetadata($recipient, array $metadata);
+    public function setPerRecipientMetadata(string $recipient, array $metadata): ExtendedMessage;
 
     /**
      * @return array
      */
-    public function getSubstitutionData();
+    public function getSubstitutionData(): array;
 
     /**
      * @param array $substitutionData
      *
      * @return static
      */
-    public function setSubstitutionData(array $substitutionData);
+    public function setSubstitutionData(array $substitutionData): ExtendedMessage;
 
     /**
      * @return array
      */
-    public function getPerRecipientSubstitutionData();
+    public function getPerRecipientSubstitutionData(): array;
 
     /**
      * @param string $recipient
@@ -87,26 +87,26 @@ interface ExtendedMessage
      *
      * @return static
      */
-    public function setPerRecipientSubstitutionData($recipient, array $substitutionData);
+    public function setPerRecipientSubstitutionData(string $recipient, array $substitutionData): ExtendedMessage;
 
     /**
      * @return array
      */
-    public function getOptions();
+    public function getOptions(): array;
 
     /**
      * @param array $options
      *
      * @return static
      */
-    public function setOptions(array $options);
+    public function setOptions(array $options): ExtendedMessage;
 
     /**
      * @param string|Swift_OutputByteStream $body
-     * @param string|null                   $contentType
-     * @param string|null                   $charset
+     * @param string|null $contentType
+     * @param string|null $charset
      *
      * @return static
      */
-    public function addPart($body, $contentType = null, $charset = null);
+    public function addPart($body, string $contentType = null, string $charset = null);
 }

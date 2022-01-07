@@ -78,7 +78,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function getCampaignId()
+    public function getCampaignId(): string
     {
         return $this->campaignId;
     }
@@ -86,7 +86,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function setCampaignId($campaignId)
+    public function setCampaignId(string $campaignId): ExtendedMessage
     {
         $this->campaignId = $campaignId;
 
@@ -96,7 +96,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function getPerRecipientTags()
+    public function getPerRecipientTags(): array
     {
         return $this->perRecipientTags;
     }
@@ -104,7 +104,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function setPerRecipientTags($recipient, array $tags)
+    public function setPerRecipientTags(string $recipient, array $tags): ExtendedMessage
     {
         $this->perRecipientTags[(string) $recipient] = $this->sanitizeTags($tags);
 
@@ -114,7 +114,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function getMetadata()
+    public function getMetadata(): array
     {
         return $this->metadata;
     }
@@ -122,7 +122,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function setMetadata(array $metadata)
+    public function setMetadata(array $metadata): ExtendedMessage
     {
         $this->metadata = $this->sanitizeMetadata($metadata);
 
@@ -132,7 +132,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function getPerRecipientMetadata()
+    public function getPerRecipientMetadata(): array
     {
         return $this->perRecipientMetadata;
     }
@@ -140,7 +140,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function setPerRecipientMetadata($recipient, array $metadata)
+    public function setPerRecipientMetadata(string $recipient, array $metadata): ExtendedMessage
     {
         $this->perRecipientMetadata[(string) $recipient] = $this->sanitizeMetadata($metadata);
 
@@ -150,7 +150,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function getSubstitutionData()
+    public function getSubstitutionData(): array
     {
         return $this->substitutionData;
     }
@@ -158,7 +158,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function setSubstitutionData(array $substitutionData)
+    public function setSubstitutionData(array $substitutionData): ExtendedMessage
     {
         $this->substitutionData = $this->sanitizeSubstitutionData($substitutionData);
 
@@ -168,7 +168,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function getPerRecipientSubstitutionData()
+    public function getPerRecipientSubstitutionData(): array
     {
         return $this->perRecipientSubstitutionData;
     }
@@ -176,7 +176,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function setPerRecipientSubstitutionData($recipient, array $substitutionData)
+    public function setPerRecipientSubstitutionData(string $recipient, array $substitutionData): ExtendedMessage
     {
         $this->perRecipientSubstitutionData[(string) $recipient] = $this->sanitizeSubstitutionData($substitutionData);
 
@@ -186,7 +186,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -194,7 +194,7 @@ final class Message extends Swift_Message implements ExtendedMessage
     /**
      * {@inheritdoc}
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): ExtendedMessage
     {
         $this->options = array_merge(
             $this->options,
@@ -209,7 +209,7 @@ final class Message extends Swift_Message implements ExtendedMessage
      *
      * @return array
      */
-    private function sanitizeTags(array $tags)
+    private function sanitizeTags(array $tags): array
     {
         $sanitized = [];
 
@@ -225,7 +225,7 @@ final class Message extends Swift_Message implements ExtendedMessage
      *
      * @return array
      */
-    private function sanitizeMetadata(array $metadata)
+    private function sanitizeMetadata(array $metadata): array
     {
         array_walk_recursive(
             $metadata,

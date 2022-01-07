@@ -15,7 +15,7 @@ final class MtRandomNumberGenerator implements RandomNumberGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate()
+    public function generate(): float
     {
         return (mt_rand() / mt_getrandmax());
     }

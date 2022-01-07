@@ -18,7 +18,7 @@ trait OptionsSanitizingCapabilities
      * @return array
      * @throws Exception
      */
-    private function sanitizeOptions(array $options)
+    private function sanitizeOptions(array $options): array
     {
         $booleanOptions = [
             Option::TRANSACTIONAL,

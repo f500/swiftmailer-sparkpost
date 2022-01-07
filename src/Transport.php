@@ -41,12 +41,12 @@ final class Transport implements Swift_Transport
     private $payloadBuilder;
 
     /**
-     * @param string             $apiKey
+     * @param string $apiKey
      * @param Configuration|null $config
      *
      * @return Transport
      */
-    public static function newInstance($apiKey, Configuration $config = null)
+    public static function newInstance(string $apiKey, Configuration $config = null): Transport
     {
         if ($config === null) {
             $config = new Configuration();
@@ -79,7 +79,7 @@ final class Transport implements Swift_Transport
     /**
      * {@inheritdoc}
      */
-    public function isStarted()
+    public function isStarted(): bool
     {
         return true;
     }
@@ -101,7 +101,7 @@ final class Transport implements Swift_Transport
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null): int
     {
         $failedRecipients = (array) $failedRecipients;
 
@@ -155,7 +155,7 @@ final class Transport implements Swift_Transport
      * @return array
      * @throws Swift_TransportException
      */
-    private function buildPayload(Swift_Mime_SimpleMessage $message)
+    private function buildPayload(Swift_Mime_SimpleMessage $message): array
     {
         try {
             return $this->payloadBuilder->buildPayload($message);
@@ -173,7 +173,7 @@ final class Transport implements Swift_Transport
      * @return SparkPostResponse
      * @throws Swift_TransportException
      */
-    private function sendTransmission(array $payload)
+    private function sendTransmission(array $payload): SparkPostResponse
     {
         try {
             /** @noinspection PhpUndefinedVariableInspection */
@@ -202,12 +202,12 @@ final class Transport implements Swift_Transport
     }
 
     /**
-     * @param string       $message
+     * @param string $message
      * @param AnyException $exception
      *
      * @return Swift_TransportException
      */
-    private function createAndDispatchTransportException($message, AnyException $exception)
+    private function createAndDispatchTransportException(string $message, AnyException $exception): Swift_TransportException
     {
         $transportException = new Swift_TransportException($message, 0, $exception);
 
@@ -218,7 +218,7 @@ final class Transport implements Swift_Transport
         return $transportException;
     }
 
-    public function ping()
+    public function ping(): bool
     {
         return true;
     }

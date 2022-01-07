@@ -17,5 +17,5 @@ interface RandomNumberGenerator
      *
      * @return float
      */
-    public function generate();
+    public function generate(): float;
 }

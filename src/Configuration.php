@@ -37,7 +37,7 @@ final class Configuration
     /**
      * @return Configuration
      */
-    public static function newInstance()
+    public static function newInstance(): Configuration
     {
         return new self();
     }
@@ -50,7 +50,7 @@ final class Configuration
         $this->ipPoolProbability  = 1.0;
     }
 
-    public function overrideRecipients()
+    public function overrideRecipients(): bool
     {
         return $this->recipientOverride !== '';
     }
@@ -58,7 +58,7 @@ final class Configuration
     /**
      * @return bool
      */
-    public function overrideGmailStyle()
+    public function overrideGmailStyle(): bool
     {
         return $this->overrideGmailStyle;
     }
@@ -68,7 +68,7 @@ final class Configuration
      *
      * @return Configuration
      */
-    public function setOverrideGmailStyle($overrideGmailStyle)
+    public function setOverrideGmailStyle(bool $overrideGmailStyle): Configuration
     {
         $this->overrideGmailStyle = (bool) $overrideGmailStyle;
 
@@ -78,18 +78,18 @@ final class Configuration
     /**
      * @return string
      */
-    public function getRecipientOverride()
+    public function getRecipientOverride(): string
     {
         return $this->recipientOverride;
     }
 
     /**
-     * @param string $recipientOverride
+     * @param string|null $recipientOverride
      *
      * @return Configuration
      * @throws Exception
      */
-    public function setRecipientOverride($recipientOverride)
+    public function setRecipientOverride(?string $recipientOverride): Configuration
     {
         if (!$recipientOverride) {
             return $this;
@@ -107,7 +107,7 @@ final class Configuration
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -117,7 +117,7 @@ final class Configuration
      *
      * @return Configuration
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): Configuration
     {
         $this->options = array_merge(
             $this->options,
@@ -130,7 +130,7 @@ final class Configuration
     /**
      * @return float
      */
-    public function getIpPoolProbability()
+    public function getIpPoolProbability(): float
     {
         return $this->ipPoolProbability;
     }
@@ -141,7 +141,7 @@ final class Configuration
      * @return Configuration
      * @throws Exception
      */
-    public function setIpPoolProbability($ipPoolProbability)
+    public function setIpPoolProbability(float $ipPoolProbability): Configuration
     {
         if ($ipPoolProbability < 0 || $ipPoolProbability > 1) {
             throw new Exception('IP pool probability must be between 0 and 1');

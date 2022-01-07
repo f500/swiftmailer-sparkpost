@@ -19,5 +19,5 @@ interface PayloadBuilder
      *
      * @return array
      */
-    public function buildPayload(Swift_Mime_SimpleMessage $message);
+    public function buildPayload(Swift_Mime_SimpleMessage $message): array;
 }
