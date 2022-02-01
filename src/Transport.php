@@ -8,14 +8,14 @@ namespace SwiftSparkPost;
 
 use Exception as AnyException;
 use GuzzleHttp\Client as GuzzleClient;
-use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
+use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use SparkPost\SparkPost;
 use SparkPost\SparkPostResponse;
 use Swift_DependencyContainer;
 use Swift_Events_EventDispatcher;
 use Swift_Events_EventListener;
 use Swift_Events_SendEvent;
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 use Swift_Transport;
 use Swift_TransportException;
 
@@ -41,12 +41,12 @@ final class Transport implements Swift_Transport
     private $payloadBuilder;
 
     /**
-     * @param string             $apiKey
+     * @param string $apiKey
      * @param Configuration|null $config
      *
      * @return Transport
      */
-    public static function newInstance($apiKey, Configuration $config = null)
+    public static function newInstance(string $apiKey, Configuration $config = null): Transport
     {
         if ($config === null) {
             $config = new Configuration();
@@ -79,7 +79,7 @@ final class Transport implements Swift_Transport
     /**
      * {@inheritdoc}
      */
-    public function isStarted()
+    public function isStarted(): bool
     {
         return true;
     }
@@ -101,7 +101,7 @@ final class Transport implements Swift_Transport
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null): int
     {
         $failedRecipients = (array) $failedRecipients;
 
@@ -150,12 +150,12 @@ final class Transport implements Swift_Transport
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      * @throws Swift_TransportException
      */
-    private function buildPayload(Swift_Mime_Message $message)
+    private function buildPayload(Swift_Mime_SimpleMessage $message): array
     {
         try {
             return $this->payloadBuilder->buildPayload($message);
@@ -173,7 +173,7 @@ final class Transport implements Swift_Transport
      * @return SparkPostResponse
      * @throws Swift_TransportException
      */
-    private function sendTransmission(array $payload)
+    private function sendTransmission(array $payload): SparkPostResponse
     {
         try {
             /** @noinspection PhpUndefinedVariableInspection */
@@ -202,12 +202,12 @@ final class Transport implements Swift_Transport
     }
 
     /**
-     * @param string       $message
+     * @param string $message
      * @param AnyException $exception
      *
      * @return Swift_TransportException
      */
-    private function createAndDispatchTransportException($message, AnyException $exception)
+    private function createAndDispatchTransportException(string $message, AnyException $exception): Swift_TransportException
     {
         $transportException = new Swift_TransportException($message, 0, $exception);
 
@@ -216,5 +216,10 @@ final class Transport implements Swift_Transport
         }
 
         return $transportException;
+    }
+
+    public function ping(): bool
+    {
+        return true;
     }
 }

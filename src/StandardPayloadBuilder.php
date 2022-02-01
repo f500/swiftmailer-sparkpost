@@ -7,8 +7,8 @@
 namespace SwiftSparkPost;
 
 use Swift_Attachment;
+use Swift_Mime_SimpleMessage;
 use Swift_Mime_Header;
-use Swift_Mime_Message;
 use Swift_MimePart;
 
 /**
@@ -38,11 +38,11 @@ final class StandardPayloadBuilder implements PayloadBuilder
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      */
-    public function buildPayload(Swift_Mime_Message $message)
+    public function buildPayload(Swift_Mime_SimpleMessage $message): array
     {
         $payload = [
             'recipients' => $this->buildRecipients($message),
@@ -69,12 +69,12 @@ final class StandardPayloadBuilder implements PayloadBuilder
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      * @throws Exception
      */
-    private function buildRecipients(Swift_Mime_Message $message)
+    private function buildRecipients(Swift_Mime_SimpleMessage $message): array
     {
         $tos = array_merge((array) $message->getTo(), (array) $message->getCc());
         $bcc = (array) $message->getBcc();
@@ -110,7 +110,7 @@ final class StandardPayloadBuilder implements PayloadBuilder
 
     /**
      * @param string $email
-     * @param string $name
+     * @param string|null $name
      * @param array  $tags
      * @param array  $metadata
      * @param array  $substitutionData
@@ -119,13 +119,14 @@ final class StandardPayloadBuilder implements PayloadBuilder
      * @return array
      */
     private function buildRecipient(
-        $email,
-        $name,
-        array $tags,
-        array $metadata,
-        array $substitutionData,
-        $originalEmail = ''
-    ) {
+        string $email,
+        ?string $name,
+        array  $tags,
+        array  $metadata,
+        array  $substitutionData,
+        string $originalEmail = ''
+    ): array
+    {
         $recipient = ['address' => ['email' => $this->overrideRecipient($email)]];
 
         if ($name) {
@@ -152,11 +153,11 @@ final class StandardPayloadBuilder implements PayloadBuilder
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      */
-    private function buildContent(Swift_Mime_Message $message)
+    private function buildContent(Swift_Mime_SimpleMessage $message): array
     {
         $content = [
             'subject' => $this->convertAsteriskPipeToCurlyBraces($message->getSubject()),
@@ -197,11 +198,11 @@ final class StandardPayloadBuilder implements PayloadBuilder
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array|string
      */
-    private function buildFrom(Swift_Mime_Message $message)
+    private function buildFrom(Swift_Mime_SimpleMessage $message)
     {
         $from = $message->getFrom();
 
@@ -213,11 +214,11 @@ final class StandardPayloadBuilder implements PayloadBuilder
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      */
-    private function buildHeaders(Swift_Mime_Message $message)
+    private function buildHeaders(Swift_Mime_SimpleMessage $message): array
     {
         $headers = [];
         $filter  = [
@@ -252,11 +253,11 @@ final class StandardPayloadBuilder implements PayloadBuilder
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      */
-    private function buildAttachments(Swift_Mime_Message $message)
+    private function buildAttachments(Swift_Mime_SimpleMessage $message): array
     {
         $attachments = [];
 
@@ -274,11 +275,11 @@ final class StandardPayloadBuilder implements PayloadBuilder
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return string
      */
-    private function buildCampaignId(Swift_Mime_Message $message)
+    private function buildCampaignId(Swift_Mime_SimpleMessage $message): string
     {
         if (!($message instanceof Message)) {
             return '';
@@ -288,11 +289,11 @@ final class StandardPayloadBuilder implements PayloadBuilder
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      */
-    private function buildMetadata(Swift_Mime_Message $message)
+    private function buildMetadata(Swift_Mime_SimpleMessage $message): array
     {
         if (!($message instanceof Message)) {
             return [];
@@ -302,11 +303,11 @@ final class StandardPayloadBuilder implements PayloadBuilder
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      */
-    private function buildSubstitutionData(Swift_Mime_Message $message)
+    private function buildSubstitutionData(Swift_Mime_SimpleMessage $message): array
     {
         if (!($message instanceof Message)) {
             return [];
@@ -316,11 +317,11 @@ final class StandardPayloadBuilder implements PayloadBuilder
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return array
      */
-    private function buildOptions(Swift_Mime_Message $message)
+    private function buildOptions(Swift_Mime_SimpleMessage $message): array
     {
         $options = $this->config->getOptions();
 
@@ -342,20 +343,20 @@ final class StandardPayloadBuilder implements PayloadBuilder
      *
      * @return string
      */
-    private function convertAsteriskPipeToCurlyBraces($content)
+    private function convertAsteriskPipeToCurlyBraces($content): string
     {
         return preg_replace('/\*\|(.+?)\|\*/', '{{\1}}', $content);
     }
 
     /**
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      *
      * @return string
      */
-    private function readUserContentType(Swift_Mime_Message $message)
+    private function readUserContentType(Swift_Mime_SimpleMessage $message): string
     {
         $ro = new \ReflectionObject($message);
-        $rp = $ro->getProperty('_userContentType');
+        $rp = $ro->getProperty('userContentType');
         $rp->setAccessible(true);
         return (string) $rp->getValue($message);
     }
@@ -365,7 +366,7 @@ final class StandardPayloadBuilder implements PayloadBuilder
      *
      * @return string
      */
-    private function overrideRecipient($email)
+    private function overrideRecipient(string $email): string
     {
         if (!$this->config->overrideRecipients()) {
             return $email;
@@ -384,7 +385,7 @@ final class StandardPayloadBuilder implements PayloadBuilder
     /**
      * @return bool
      */
-    private function configuredIpPoolShouldBeUsed()
+    private function configuredIpPoolShouldBeUsed(): bool
     {
         if ($this->config->getIpPoolProbability() === 0.0) {
             return false;

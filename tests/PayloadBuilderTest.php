@@ -6,11 +6,11 @@
 
 namespace SwiftSparkPost\Tests;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Swift_Attachment;
-use Swift_Message;
 use SwiftSparkPost\Configuration;
+use SwiftSparkPost\Exception;
 use SwiftSparkPost\Message;
 use SwiftSparkPost\Option;
 use SwiftSparkPost\RandomNumberGenerator;
@@ -20,7 +20,7 @@ use SwiftSparkPost\StandardPayloadBuilder;
  * @copyright Future500 B.V.
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  */
-final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
+final class PayloadBuilderTest extends TestCase
 {
     /**
      * @var StandardPayloadBuilder
@@ -32,7 +32,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     private $randomNumberGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->randomNumberGenerator = $this->prophesize(RandomNumberGenerator::class);
 
@@ -42,7 +42,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->payloadBuilder = null;
     }
@@ -52,7 +52,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     public function it_builds_the_payload_for_a_plain_swift_message()
     {
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com')
             ->setTo(['john@doe.com'])
             ->setSubject('Hello there!')
@@ -123,7 +123,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
         $message->addPart('This is a special message just for you.', 'text/plain');
         $message->getHeaders()->addTextHeader('X-Custom', 'some-custom-header');
 
-        $attachment = Swift_Attachment::newInstance('Some text in a file.', 'textfile.txt', 'text/plain');
+        $attachment = new Swift_Attachment('Some text in a file.', 'textfile.txt', 'text/plain');
         $message->attach($attachment);
 
         $message->setCampaignId('some-campaign');
@@ -202,7 +202,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     public function it_builds_the_payload_with_addresses_in_string_form()
     {
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com')
             ->setReplyTo('noreply@domain.com')
             ->setTo('john@doe.com')
@@ -236,7 +236,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     public function it_builds_the_payload_with_addresses_and_names_in_string_form()
     {
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com', 'Me')
             ->setReplyTo('noreply@domain.com', 'No Reply')
             ->setTo('john@doe.com', 'John')
@@ -270,7 +270,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     public function it_builds_the_payload_with_addresses_in_array_form()
     {
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom(['me@domain.com'])
             ->setReplyTo(['noreply@domain.com'])
             ->setTo(['john@doe.com'])
@@ -304,7 +304,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     public function it_builds_the_payload_with_addresses_and_names_in_array_form()
     {
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom(['me@domain.com' => 'Me'])
             ->setReplyTo(['noreply@domain.com' => 'No Reply'])
             ->setTo(['john@doe.com' => 'John'])
@@ -338,7 +338,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     public function it_convertss_asterisk_pipe_variables_to_curly_braces()
     {
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com')
             ->setTo(['john@doe.com'])
             ->setSubject('Hello there, *|NAME|*!')
@@ -370,12 +370,13 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \SwiftSparkPost\Exception
-     * @expectedExceptionMessage Cannot send message without a recipient address
      */
     public function it_does_not_accept_a_message_without_real_recipients()
     {
-        $message = Swift_Message::newInstance()
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Cannot send message without a recipient address');
+
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com');
 
         $this->payloadBuilder->buildPayload($message);
@@ -394,7 +395,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             $this->randomNumberGenerator->reveal()
         );
 
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com', 'Me')
             ->setReplyTo('noreply@domain.com', 'No Reply')
             ->setTo(['john@doe.com' => 'John', 'jack@doe.com' => 'Jack'])
@@ -511,7 +512,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             $this->randomNumberGenerator->reveal()
         );
 
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com', 'Me')
             ->setReplyTo('noreply@domain.com', 'No Reply')
             ->setTo(['john@doe.com' => 'John', 'jack@doe.com' => 'Jack'])
@@ -638,7 +639,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             $this->randomNumberGenerator->reveal()
         );
 
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com')
             ->setTo(['john@doe.com']);
 
@@ -683,7 +684,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             ->setRecipientOverride('override@domain.com')
             ->setOptions([Option::TRANSACTIONAL => false]);
 
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com')
             ->setTo(['john@doe.com']);
 
@@ -783,7 +784,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             $this->randomNumberGenerator->reveal()
         );
 
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com')
             ->setTo(['john@doe.com']);
 
@@ -823,7 +824,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             $this->randomNumberGenerator->reveal()
         );
 
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com')
             ->setTo(['john@doe.com']);
 
@@ -863,7 +864,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
             $this->randomNumberGenerator->reveal()
         );
 
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com')
             ->setTo(['john@doe.com']);
 
@@ -895,7 +896,7 @@ final class PayloadBuilderTest extends PHPUnit_Framework_TestCase
      */
     public function it_builds_headers_as_an_array_of_key_value_pairs()
     {
-        $message = Swift_Message::newInstance()
+        $message = (new \Swift_Message())
             ->setFrom('me@domain.com')
             ->setTo(['john@doe.com'])
             ->setSubject('Hello there!')
