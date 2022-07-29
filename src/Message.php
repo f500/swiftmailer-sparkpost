@@ -17,6 +17,11 @@ final class Message extends Swift_Message implements ExtendedMessage
     use OptionsSanitizingCapabilities;
 
     /**
+     * @var int
+     */
+    private $transmissionId = 0;
+
+    /**
      * @var string
      */
     private $campaignId;
@@ -73,6 +78,24 @@ final class Message extends Swift_Message implements ExtendedMessage
         $this->substitutionData             = [];
         $this->perRecipientSubstitutionData = [];
         $this->options                      = [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTransmissionId(): int
+    {
+        return $this->transmissionId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setTransmissionId(int $transmissionId): ExtendedMessage
+    {
+        $this->transmissionId = $transmissionId;
+
+        return $this;
     }
 
     /**

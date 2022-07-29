@@ -125,6 +125,10 @@ final class Transport implements Swift_Transport
             ? (int) $body['results']['total_rejected_recipients']
             : 0;
 
+        if ($message instanceof ExtendedMessage) {
+            $message->setTransmissionId($body['results']['id'] ?? 0);
+        }
+
         if ($event) {
             if ($sent === 0) {
                 $event->setResult(Swift_Events_SendEvent::RESULT_FAILED);

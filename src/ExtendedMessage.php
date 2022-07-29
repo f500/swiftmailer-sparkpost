@@ -15,6 +15,17 @@ use Swift_OutputByteStream;
 interface ExtendedMessage
 {
     /**
+     * @return int
+     */
+    public function getTransmissionId(): int;
+
+    /**
+     * @param int $transmissionId
+     * @return static
+     */
+    public function setTransmissionId(int $transmissionId): ExtendedMessage;
+
+    /**
      * @return string
      */
     public function getCampaignId(): string;

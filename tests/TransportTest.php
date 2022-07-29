@@ -158,6 +158,7 @@ final class TransportTest extends TestCase
         $sent = $this->transport->send($message);
 
         $this->assertSame(2, $sent);
+        $this->assertEquals(11668787484950529, $message->getTransmissionId());
     }
 
     /**
