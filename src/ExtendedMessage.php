@@ -119,5 +119,5 @@ interface ExtendedMessage
      *
      * @return static
      */
-    public function addPart($body, string $contentType = null, string $charset = null);
+    public function addPart($body, $contentType = null, $charset = null);
 }
